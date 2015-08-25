@@ -55,7 +55,6 @@ namespace Kaizo.Tasks
 			}
 
 			root.AddImport ("$(MSBuildBinPath)\\Microsoft.CSharp.targets");
-			root.Save ("test.csproj");
 
 			ProjectInstance project = new ProjectInstance (root);
 			project.Build ();
