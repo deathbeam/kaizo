@@ -3,27 +3,29 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Execution;
+using NLua;
 
-namespace Kaizo
+namespace Kaizo.Tasks
 {
-	public class Project
+	public class Build : Task
 	{
-		private string name, version, nmspace;
+		public Build(Lua lua) : base(lua) { }
 
-		public Project(string name, string version, string nmspace)
-		{
-			this.name = name;
-			this.version = version;
-			this.nmspace = nmspace;
-		}
+		public override void Execute(LuaTable args) {
+			string name = args ["name"] as string;
+			if (name == null) name = lua ["name"] as string;
 
-		public void Build()
-		{
+			string namspace = args ["namespace"] as string;
+			if (namspace == null) namspace = lua ["namespace"] as string;
+
+			string version = args ["version"] as string;
+			if (version == null) version = lua ["version"] as string;
+
 			var root = ProjectRootElement.Create ();
 			var group = root.AddPropertyGroup ();
 			group.AddProperty ("Configuration", "Release");
 			group.AddProperty ("Platform", "x86");
-			group.AddProperty ("RootNamespace", nmspace);
+			group.AddProperty ("RootNamespace", namspace);
 			group.AddProperty ("AssemblyName", name);
 			group.AddProperty ("ProductVersion", version);
 			group.AddProperty ("OutputPath", "bin");

@@ -2,6 +2,9 @@
 using NLua;
 using System.IO;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
+using Kaizo.Tasks;
 
 namespace Kaizo
 {
@@ -11,18 +14,20 @@ namespace Kaizo
 		{
 			using (Lua lua = new Lua ()) {
 				lua.LoadCLRPackage ();
-				lua.DoFile (Path.Combine(Directory.GetCurrentDirectory(), "project.lua"));
 
-				var dependencies = lua ["dependencies"] as LuaTable;
+				var tasks = Assembly.GetExecutingAssembly().GetTypes().Where(
+					t => String.Equals(t.Namespace, "Kaizo.Tasks", StringComparison.Ordinal) &&
+					!String.Equals(t.Name, "Task", StringComparison.Ordinal)).ToArray();
 
-				foreach (string key in dependencies.Values) {
-					Dependency.Install (key);
+				foreach (var task in tasks) {
+					Activator.CreateInstance<Task>(task, lua);
 				}
 
-				new Project (
-					lua ["name"] as string,
-					lua ["version"] as string,
-					lua ["namespace"] as string).Build();
+				lua.DoFile (Path.Combine(Directory.GetCurrentDirectory(), "project.lua"));
+
+				foreach (string key in (lua ["dependencies"] as LuaTable).Values) {
+					Dependency.Install (key);
+				}
 
 				if (args.GetLength(0) > 0) {
 					var task = lua [args[0]] as LuaFunction;
