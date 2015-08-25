@@ -29,14 +29,14 @@ namespace Kaizo
 			group.AddProperty ("OutputPath", "bin");
 			group.AddProperty ("OutputType", "exe");
 			group.AddProperty ("ProjectGuid", System.Guid.NewGuid ().ToString ());
-			group.AddProperty ("TargetFrameworkVersion", "v4.5");
+			group.AddProperty ("TargetFrameworkVersion", "v4.0");
 
 			var references = root.AddItemGroup ();
 
 			foreach (var dependency in Dependency.All) {
 				foreach (var reference in dependency.AssemblyReferences) {
 					foreach (var frmwrk in reference.SupportedFrameworks) {
-						if (frmwrk.Version == new Version (4, 5)) {
+						if (frmwrk.Version == new Version (4, 0)) {
 							references.AddItem ("Reference", reference.Name,
 								new KeyValuePair<string, string>[] {
 									new KeyValuePair<string, string> ("HintPath", reference.Path)

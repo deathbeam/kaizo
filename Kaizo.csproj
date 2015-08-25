@@ -39,19 +39,19 @@
     <Reference Include="NLua">
       <HintPath>..\packages\NLua_Safe.1.3.2.1\lib\net45\NLua.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Web.XmlTransform">
-      <HintPath>..\packages\Microsoft.Web.Xdt.1.0.0\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
-    </Reference>
     <Reference Include="NuGet.Core">
       <HintPath>..\packages\Mono.NuGet.Core.2.8.1\lib\Net40\NuGet.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Build" />
+    <Reference Include="Microsoft.Web.XmlTransform">
+      <HintPath>packages\Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Project.cs" />
-    <Compile Include="Dependency.cs" />
+    <Compile Include="src\Program.cs" />
+    <Compile Include="src\Properties\AssemblyInfo.cs" />
+    <Compile Include="src\Project.cs" />
+    <Compile Include="src\Dependency.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
