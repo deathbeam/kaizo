@@ -20,6 +20,30 @@ namespace Kaizo
 	{
 		public static void Main (string[] args)
 		{
+			args = new[] { "echo", "message:hello" };
+			string file = @"
+				name = 'My Project'
+				version = '1.0.0'
+				namespace = 'MyProject'
+
+				dependencies = {
+				  -- System dependencies
+				  'System',
+				  'Microsoft.Build',
+				  'Microsoft.Build.Framework',
+				  -- NuGet dependencies
+				  'NLua_Safe:1.3.2.1',
+				  'Mono.NuGet.Core:2.8.1',
+				  'Microsoft.Web.Xdt:2.1.1'
+				}
+
+				-- Usage: echo message:<your_message>
+				function echo(args)
+				  build()
+				  print(args.message)
+				end
+			";
+
 			using (Lua lua = new Lua ()) {
 				lua.LoadCLRPackage ();
 
@@ -31,11 +55,8 @@ namespace Kaizo
 					Activator.CreateInstance(task, lua);
 				}
 
-				lua.DoFile (Path.Combine(Directory.GetCurrentDirectory(), "project.lua"));
-
-				foreach (string key in (lua ["dependencies"] as LuaTable).Values) {
-					Dependency.Install (key);
-				}
+				lua.DoString (file);
+				//lua.DoFile (Path.Combine(Directory.GetCurrentDirectory(), "project.lua"));
 
 				if (args.Length > 0) {
 					var task = lua.GetFunction(args[0]);

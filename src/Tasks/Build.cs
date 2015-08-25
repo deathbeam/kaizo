@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Execution;
+using Microsoft.Build.Logging;
 using NLua;
+using NuGet;
 
 namespace Kaizo.Tasks
 {
@@ -35,31 +37,65 @@ namespace Kaizo.Tasks
 			group.AddProperty ("ProjectGuid", System.Guid.NewGuid ().ToString ());
 			group.AddProperty ("TargetFrameworkVersion", "v4.0");
 
+			PackageManager packages = new PackageManager(
+				PackageRepositoryFactory.Default.CreateRepository("https://packages.nuget.org/api/v2"),
+				Path.Combine(Directory.GetCurrentDirectory(), "packages"));
+
+			packages.PackageInstalled += delegate(object sender, PackageOperationEventArgs arg) {
+				Console.WriteLine (" [DONE]");
+			};
+
+			packages.PackageInstalling += delegate(object sender, PackageOperationEventArgs arg) {
+				Console.Write ("Installing " + arg.Package.GetFullName() + "...");
+			};
+
+			packages.PackageUninstalled += delegate(object sender, PackageOperationEventArgs arg) {
+
+			};
+
+			packages.PackageUninstalling += delegate(object sender, PackageOperationEventArgs arg) {
+
+			};
+
 			var references = root.AddItemGroup ();
 
-			foreach (var dependency in Dependency.All) {
-				foreach (var reference in dependency.AssemblyReferences) {
-					foreach (var frmwrk in reference.SupportedFrameworks) {
-						if (frmwrk.Version == new Version (4, 0)) {
-							references.AddItem ("Reference", reference.Name,
-								new KeyValuePair<string, string>[] {
-									new KeyValuePair<string, string> ("HintPath", reference.Path)
-								});
+			foreach (string key in (lua ["dependencies"] as LuaTable).Values) {
+				if (key.IndexOf (':') > -1) {
+					var splitkey = key.Split (':');
+					packages.InstallPackage (splitkey [0], SemanticVersion.Parse (splitkey [1]));
+
+					foreach (var dependency in packages.LocalRepository.GetPackages ()) {
+						foreach (var reference in dependency.AssemblyReferences) {
+							foreach (var frmwrk in reference.SupportedFrameworks) {
+								if (frmwrk.Version == new Version (4, 0)) {
+									references.AddItem ("Reference", reference.Name,
+										new KeyValuePair<string, string>[] {
+											new KeyValuePair<string, string> (
+												"HintPath", 
+												Path.Combine ("packages", dependency.Id + "." + dependency.Version.ToString(), reference.Path))
+										}
+									);
+								}
+							}
 						}
 					}
+				} else {
+					references.AddItem("Reference", key);
 				}
 			}
 
-			var compile = root.AddItemGroup ();
+			if (File.Exists (Path.Combine (Directory.GetCurrentDirectory (), "src"))) {
+				var compile = root.AddItemGroup ();
 
-			foreach (var file in Directory.GetFiles (Path.Combine (Directory.GetCurrentDirectory (), "src"), "*.cs", SearchOption.AllDirectories)) {
-				compile.AddItem ("Compile", file);
+				foreach (var file in Directory.GetFiles (Path.Combine (Directory.GetCurrentDirectory (), "src"), "*.cs", SearchOption.AllDirectories)) {
+					compile.AddItem ("Compile", file);
+				}
 			}
 
 			root.AddImport ("$(MSBuildBinPath)\\Microsoft.CSharp.targets");
 
 			ProjectInstance project = new ProjectInstance (root);
-			project.Build ();
+			project.Build (new[] { new ConsoleLogger() });
 		}
 	}
 }
