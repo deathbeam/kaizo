@@ -1,5 +1,6 @@
 ﻿using System;
 using NLua;
+using System.Reflection;
 
 namespace Kaizo.Tasks
 {
@@ -9,7 +10,9 @@ namespace Kaizo.Tasks
 
 		public Task(Lua lua) {
 			this.lua = lua;
-			lua.RegisterFunction(this.GetType().Name.ToLower(), this, this.GetType().GetMethod("Execute"));
+			string name = this.GetType ().Name.ToLower ();
+			MethodInfo method = this.GetType ().GetMethod ("Execute");
+			lua.RegisterFunction(name, this, method);
 		}
 
 		public abstract void Execute(LuaTable args);

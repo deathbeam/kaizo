@@ -8,6 +8,14 @@ using Kaizo.Tasks;
 
 namespace Kaizo
 {
+	public static class LuaExtensions
+	{
+		public static LuaTable CreateTable(this Lua lua)
+		{
+			return (LuaTable)lua.DoString("return {}")[0];
+		}
+	} 
+
 	class MainClass
 	{
 		public static void Main (string[] args)
@@ -20,7 +28,7 @@ namespace Kaizo
 					!String.Equals(t.Name, "Task", StringComparison.Ordinal)).ToArray();
 
 				foreach (var task in tasks) {
-					Activator.CreateInstance<Task>(task, lua);
+					Activator.CreateInstance(task, lua);
 				}
 
 				lua.DoFile (Path.Combine(Directory.GetCurrentDirectory(), "project.lua"));
@@ -29,12 +37,25 @@ namespace Kaizo
 					Dependency.Install (key);
 				}
 
-				if (args.GetLength(0) > 0) {
-					var task = lua [args[0]] as LuaFunction;
-					var list = new List<string> (args);
-					list.RemoveAt (0);
-					args = list.ToArray ();
-					task.Call (args);
+				if (args.Length > 0) {
+					var task = lua.GetFunction(args[0]);
+
+					if (args.Length > 1) {
+						var list = new List<string> (args);
+						list.RemoveAt (0);
+						args = list.ToArray ();
+
+						var table = lua.CreateTable ();
+
+						foreach (var arg in args) {
+							var key = arg.Split (':');
+							table [key [0]] = key [1];
+						}
+
+						task.Call (table);
+					} else {
+						task.Call ();
+					}
 				}
 			}
 		}
