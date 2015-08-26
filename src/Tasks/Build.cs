@@ -15,29 +15,48 @@ namespace Kaizo.Tasks
 		public Build(Lua lua) : base(lua) { }
 
 		public override object Execute(LuaTable args = null) {
-			string name = (args != null) ? args ["name"] as string : lua ["name"] as string;
-			if (name == null) name = lua ["name"] as string;
+			var name = lua ["name"] as string;
+			if (name == null) name = "project";
 
-			string namspace = (args != null) ? args ["natablemespace"] as string : lua ["namespace"] as string;
-			if (namspace == null) namspace = lua ["namespace"] as string;
+			var version = lua ["version"] as string;
+			if (version == null) version = "1.0.0";
 
-			string version = (args != null) ? args ["version"] as string : lua ["version"] as string;
-			if (version == null) version = lua ["version"] as string;
+			var nspace = lua ["csharp.namespace"] as string;
+			if (nspace == null) nspace = name;
+
+			var configuration = lua ["csharp.configuration"] as string;
+			if (configuration == null) configuration = "Release";
+
+			var platform = lua ["csharp.platform"] as string;
+			if (platform == null) platform = "anycpu";
+
+			var type = lua ["csharp.type"] as string;
+			if (type == null) type = "exe";
+
+			var source = lua ["csharp.source"] as string;
+			if (source == null) source = "src";
+
+			var output = lua ["csharp.output"] as string;
+			if (output == null) output = "out";
+
+			var framework = lua ["csharp.framework"] as string;
+			if (framework == null) framework = "v4.0";
 
 			var root = ProjectRootElement.Create ();
 			root.AddImport ("$(MSBuildBinPath)\\Microsoft.CSharp.targets");
 
+
 			var group = root.AddPropertyGroup ();
-			group.AddProperty ("Configuration", "Release");
-			group.AddProperty ("Platform", "x86");
-			group.AddProperty ("PlatformTarget", "x86");
-			group.AddProperty ("RootNamespace", namspace);
+			group.AddProperty ("Configuration", configuration);
+			group.AddProperty ("Platform", platform);
+			group.AddProperty ("PlatformTarget", platform);
+			group.AddProperty ("RootNamespace", nspace);
 			group.AddProperty ("AssemblyName", name);
 			group.AddProperty ("ProductVersion", version);
-			group.AddProperty ("OutputPath", "bin");
-			group.AddProperty ("OutputType", "exe");
+			group.AddProperty ("OutputPath", output);
+			group.AddProperty ("OutputType", type);
 			group.AddProperty ("ProjectGuid", "{" + System.Guid.NewGuid ().ToString () + "}");
-			group.AddProperty ("TargetFrameworkVersion", "v4.0");
+			group.AddProperty ("TargetFrameworkVersion", framework);
 			group.AddProperty ("SchemaVersion", "2.0");
 
 			var packages = new PackageManager(PackageRepositoryFactory.Default.CreateRepository("http://packages.nuget.org/api/v2"), "packages");
@@ -66,8 +85,16 @@ namespace Kaizo.Tasks
 			foreach (string key in dependencies) {
 				if (key.IndexOf (':') > -1) {
 					var splitkey = key.Split (':');
-					packages.InstallPackage (splitkey [0], SemanticVersion.Parse (splitkey [1]));
-					var dependency = packages.LocalRepository.FindPackage (splitkey [0], SemanticVersion.Parse (splitkey [1]));
+
+					IPackage dependency = null;
+
+					if (splitkey[1] == "*") {
+						packages.InstallPackage (splitkey [0]);
+						dependency = packages.LocalRepository.FindPackage (splitkey [0]);
+					} else { 
+						packages.InstallPackage (splitkey [0], SemanticVersion.Parse (splitkey [1]));
+						dependency = packages.LocalRepository.FindPackage (splitkey [0], SemanticVersion.Parse (splitkey [1]));
+					}
 
 					foreach (var reference in dependency.AssemblyReferences) {
 						foreach (var frmwrk in reference.SupportedFrameworks) {
@@ -87,10 +114,10 @@ namespace Kaizo.Tasks
 				}
 			}
 
-			if (Directory.Exists (Path.Combine (Directory.GetCurrentDirectory (), "src"))) {
+			if (Directory.Exists (source)) {
 				var compile = root.AddItemGroup ();
 
-				foreach (var file in Directory.GetFiles (Path.Combine (Directory.GetCurrentDirectory (), "src"), "*.cs", SearchOption.AllDirectories)) {
+				foreach (var file in Directory.GetFiles (source, "*.cs", SearchOption.AllDirectories)) {
 					compile.AddItem ("Compile", file);
 				}
 			}

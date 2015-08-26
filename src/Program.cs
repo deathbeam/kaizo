@@ -21,22 +21,30 @@ namespace Kaizo
 	{
 		public static void Main (string[] args)
 		{
-			args = new[] { "echo", "message:hello" };
+			args = new[] { "echo", "message=hello" };
 			string file = @"
 				name = 'kaizo'
 				version = '0.0.1'
 				namespace = 'Kaizo'
+				
+				csharp = {
+					type = 'exe',
+					source = '../../src',
+					output = 'out',
+					configuration = 'Release',
+					namespace = 'Kaizo',
+					platform = 'x86',
+					framework = 'v4.0'
+				}
 
 				dependencies = {
-				  -- System dependencies
 				  'System',
                   'System.Core',
 				  'Microsoft.Build',
 				  'Microsoft.Build.Framework',
-				  -- NuGet dependencies
-				  'NLua_Safe:1.3.2.1',
-				  'Mono.NuGet.Core:2.8.1',
-				  'Microsoft.Web.Xdt:2.1.1'
+				  'NLua_Safe:*',
+				  'Mono.NuGet.Core:*',
+				  'Microsoft.Web.Xdt:*'
 				}
 
 				-- Usage: echo message:<your_message>
@@ -74,7 +82,7 @@ namespace Kaizo
 						var table = lua.CreateTable ();
 
 						foreach (var arg in args) {
-							var key = arg.Split (':');
+							var key = arg.Replace("\"", "").Replace("'", "").Split ('=');
 							table [key [0]] = key [1];
 						}
 
