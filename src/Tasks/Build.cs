@@ -13,13 +13,11 @@ namespace Kaizo.Tasks
 	{
 		public Build(Lua lua) : base(lua) { }
 
-		public override void Execute(LuaTable args = null) {
-			Console.WriteLine ("Building your project...");
-
+		public override object Execute(LuaTable args = null) {
 			string name = (args != null) ? args ["name"] as string : lua ["name"] as string;
 			if (name == null) name = lua ["name"] as string;
 
-			string namspace = (args != null) ? args ["namespace"] as string : lua ["namespace"] as string;
+			string namspace = (args != null) ? args ["natablemespace"] as string : lua ["namespace"] as string;
 			if (namspace == null) namspace = lua ["namespace"] as string;
 
 			string version = (args != null) ? args ["version"] as string : lua ["version"] as string;
@@ -29,16 +27,18 @@ namespace Kaizo.Tasks
 			var group = root.AddPropertyGroup ();
 			group.AddProperty ("Configuration", "Release");
 			group.AddProperty ("Platform", "x86");
+			group.AddProperty ("PlatformTarget", "x86");
 			group.AddProperty ("RootNamespace", namspace);
 			group.AddProperty ("AssemblyName", name);
 			group.AddProperty ("ProductVersion", version);
 			group.AddProperty ("OutputPath", "bin");
 			group.AddProperty ("OutputType", "exe");
-			group.AddProperty ("ProjectGuid", System.Guid.NewGuid ().ToString ());
+			group.AddProperty ("ProjectGuid", "{" + System.Guid.NewGuid ().ToString () + "}");
 			group.AddProperty ("TargetFrameworkVersion", "v4.0");
+			group.AddProperty ("SchemaVersion", "2.0");
 
 			PackageManager packages = new PackageManager(
-				PackageRepositoryFactory.Default.CreateRepository("https://packages.nuget.org/api/v2"),
+				PackageRepositoryFactory.Default.CreateRepository("http://packages.nuget.org/api/v2"),
 				Path.Combine(Directory.GetCurrentDirectory(), "packages"));
 
 			packages.PackageInstalled += delegate(object sender, PackageOperationEventArgs arg) {
@@ -63,19 +63,18 @@ namespace Kaizo.Tasks
 				if (key.IndexOf (':') > -1) {
 					var splitkey = key.Split (':');
 					packages.InstallPackage (splitkey [0], SemanticVersion.Parse (splitkey [1]));
+					var dependency = packages.LocalRepository.FindPackage (splitkey [0], SemanticVersion.Parse (splitkey [1]));
 
-					foreach (var dependency in packages.LocalRepository.GetPackages ()) {
-						foreach (var reference in dependency.AssemblyReferences) {
-							foreach (var frmwrk in reference.SupportedFrameworks) {
-								if (frmwrk.Version == new Version (4, 0)) {
-									references.AddItem ("Reference", reference.Name,
-										new KeyValuePair<string, string>[] {
-											new KeyValuePair<string, string> (
-												"HintPath", 
-												Path.Combine ("packages", dependency.Id + "." + dependency.Version.ToString(), reference.Path))
-										}
-									);
-								}
+					foreach (var reference in dependency.AssemblyReferences) {
+						foreach (var frmwrk in reference.SupportedFrameworks) {
+							if (frmwrk.Version == new Version (4, 0)) {
+								references.AddItem ("Reference", Path.GetFileNameWithoutExtension(reference.Name),
+									new KeyValuePair<string, string>[] {
+										new KeyValuePair<string, string> (
+											"HintPath", 
+											Path.Combine ("packages", dependency.Id + "." + dependency.Version.ToString(), reference.Path))
+									}
+								);
 							}
 						}
 					}
@@ -84,7 +83,7 @@ namespace Kaizo.Tasks
 				}
 			}
 
-			if (File.Exists (Path.Combine (Directory.GetCurrentDirectory (), "src"))) {
+			if (Directory.Exists (Path.Combine (Directory.GetCurrentDirectory (), "src"))) {
 				var compile = root.AddItemGroup ();
 
 				foreach (var file in Directory.GetFiles (Path.Combine (Directory.GetCurrentDirectory (), "src"), "*.cs", SearchOption.AllDirectories)) {
@@ -93,9 +92,11 @@ namespace Kaizo.Tasks
 			}
 
 			root.AddImport ("$(MSBuildBinPath)\\Microsoft.CSharp.targets");
-
+			root.Save ("test.csproj");
 			ProjectInstance project = new ProjectInstance (root);
 			project.Build (new[] { new ConsoleLogger() });
+
+			return project.FullPath;
 		}
 	}
 }

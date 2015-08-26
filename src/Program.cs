@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using Kaizo.Tasks;
+using System.Diagnostics;
 
 namespace Kaizo
 {
@@ -22,13 +23,14 @@ namespace Kaizo
 		{
 			args = new[] { "echo", "message:hello" };
 			string file = @"
-				name = 'My Project'
-				version = '1.0.0'
-				namespace = 'MyProject'
+				name = 'kaizo'
+				version = '0.0.1'
+				namespace = 'Kaizo'
 
 				dependencies = {
 				  -- System dependencies
 				  'System',
+                  'System.Core',
 				  'Microsoft.Build',
 				  'Microsoft.Build.Framework',
 				  -- NuGet dependencies
@@ -44,6 +46,10 @@ namespace Kaizo
 				end
 			";
 
+			Stopwatch time = new Stopwatch();
+			time.Start ();
+			Console.WriteLine ("Build started");
+
 			using (Lua lua = new Lua ()) {
 				lua.LoadCLRPackage ();
 
@@ -55,8 +61,7 @@ namespace Kaizo
 					Activator.CreateInstance(task, lua);
 				}
 
-				lua.DoString (file);
-				//lua.DoFile (Path.Combine(Directory.GetCurrentDirectory(), "project.lua"));
+				lua.DoString (file); //lua.DoFile (Path.Combine(Directory.GetCurrentDirectory(), "project.lua"));
 
 				if (args.Length > 0) {
 					var task = lua.GetFunction(args[0]);
@@ -79,6 +84,9 @@ namespace Kaizo
 					}
 				}
 			}
+
+			time.Stop ();
+			Console.WriteLine ("Build finished in " + time.Elapsed);
 		}
 	}
 }
