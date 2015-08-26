@@ -16,7 +16,7 @@ namespace Kaizo
 
 		public static void Main (string[] args)
 		{
-			args = new[] { "echo", "message=hello" };
+			args = new[] { "compile", "message=hello" };
 			string file = @"
 				name = 'kaizo'
 				version = '0.0.1'
@@ -42,14 +42,17 @@ namespace Kaizo
 					'Microsoft.Web.Xdt:*'
 				}
 
-				function bye(arg)
-					print(arg.message)
+				function copydll()
+					copy{
+						from = 'NLua.dll',
+						to = 'packages/NLua.dll'
+					}
 				end
 
-				function echo(arg)
-					print(arg.message)
+				function compile(arg)
+					task('copydll')
 					task('build')
-					task('bye', { message='bye' })
+					print(arg.message)
 				end
 			";
 
@@ -67,7 +70,7 @@ namespace Kaizo
 				Activator.CreateInstance(task, lua);
 			}
 
-			lua.RegisterFunction ("task", typeof(MainClass).GetMethod("Call"));
+			lua.RegisterFunction ("task", typeof(MainClass).GetMethod("CallTask"));
 
 			try {
 				lua.DoString (file); //lua.DoFile (Path.Combine(Directory.GetCurrentDirectory(), "project.lua"));
@@ -117,6 +120,10 @@ namespace Kaizo
 			Console.WriteLine (e);
 			Print("> ", "Finished in " + time.Elapsed.ToReadableString(), ConsoleColor.Red);
 			Environment.Exit (-1);
+		}
+
+		public static object CallTask(string name) {
+			return Call (name);
 		}
 
 		public static object Call(string name, LuaTable args = null)
