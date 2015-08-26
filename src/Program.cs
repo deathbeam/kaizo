@@ -16,7 +16,7 @@ namespace Kaizo
 
 		public static void Main (string[] args)
 		{
-			args = new[] { "compile", "message=hello" };
+			args = new[] { "compile", "-arg", "message=hello" };
 			string file = @"
 				name = 'kaizo'
 				version = '0.0.1'
@@ -79,24 +79,29 @@ namespace Kaizo
 			}
 
 			if (args.Length > 0) {
-				var task = args [0];
+				var cmdtasks = new List<string> (args);
+				var cmdargs = new List<string> (args);
 
-				if (args.Length > 1) {
-					var list = new List<string> (args);
-					list.RemoveAt (0);
-					args = list.ToArray ();
-
-					var table = lua.CreateTable ();
-
-					foreach (var arg in args) {
-						var key = arg.Replace ("\"", "").Replace ("'", "").Split ('=');
-						table [key [0]] = key [1];
-					}
-
-					lua ["arg"] = table;
+				if (args.Contains ("-arg")) {
+					int index = cmdargs.IndexOf ("-arg");
+					cmdargs.RemoveRange (0, index + 1);
+					cmdtasks.RemoveRange (index, args.Length - 1);
+				} else {
+					cmdargs.Clear ();
 				}
 
-				Call (task);
+				var luaargs = lua.CreateTable ();
+
+				foreach (var cmdarg in cmdargs) {
+					var key = cmdarg.Replace ("\"", "").Replace ("'", "").Split ('=');
+					luaargs [key [0]] = key [1];
+				}
+
+				lua ["arg"] = luaargs;
+
+				foreach (var cmdtask in cmdtasks) {
+					Call (cmdtask);
+				}
 			} else {
 				Call ("build");
 			}
