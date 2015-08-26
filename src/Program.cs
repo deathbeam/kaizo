@@ -38,19 +38,19 @@ namespace Kaizo
 				}
 
 				dependencies = {
-				  'System',
-                  'System.Core',
-				  'Microsoft.Build',
-				  'Microsoft.Build.Framework',
-				  'NLua_Safe:*',
-				  'Mono.NuGet.Core:*',
-				  'Microsoft.Web.Xdt:*'
+					'System',
+					'System.Core',
+					'Microsoft.Build',
+					'Microsoft.Build.Framework',
+					'NLua_Safe:*',
+					'Mono.NuGet.Core:*',
+					'Microsoft.Web.Xdt:*'
 				}
 
 				-- Usage: echo message:<your_message>
 				function echo(args)
-				  build()
-				  print(args.message)
+					build()
+					print(args.message)
 				end
 			";
 
