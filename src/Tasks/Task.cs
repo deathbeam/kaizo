@@ -14,11 +14,15 @@ namespace Kaizo.Tasks
 		public Task(Lua lua) {
 			this.lua = lua;
 			name = this.GetType ().Name.ToLower ();
-			MethodInfo method = this.GetType ().GetMethod ("Execute");
+			MethodInfo method = this.GetType ().GetMethod ("Run");
 			Get[name] = this;
 			lua.RegisterFunction(name, this, method);
 		}
 
-		public abstract object Execute(LuaTable args = null);
+		public object Run(LuaTable args = null) {
+			return Execute (args);
+		}
+
+		public abstract object Execute(LuaTable args);
 	}
 }

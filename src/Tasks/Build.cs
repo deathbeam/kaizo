@@ -14,7 +14,7 @@ namespace Kaizo.Tasks
 	{
 		public Build(Lua lua) : base(lua) { }
 
-		public override object Execute(LuaTable args = null) {
+		public override object Execute(LuaTable args) {
 			var name = lua ["name"] as string;
 			if (name == null) name = "project";
 
@@ -123,7 +123,7 @@ namespace Kaizo.Tasks
 			}
 
 			ProjectInstance project = new ProjectInstance (root);
-			ConsoleLogger logger = new ConsoleLogger(LoggerVerbosity.Minimal);
+			ConsoleLogger logger = new ConsoleLogger(LoggerVerbosity.Quiet);
 			BuildManager manager = BuildManager.DefaultBuildManager;
 
 			manager.Build(
