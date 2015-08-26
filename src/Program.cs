@@ -49,7 +49,7 @@ namespace Kaizo
 					}
 				end
 
-				function compile(arg)
+				function compile()
 					task('copydll')
 					task('build')
 					print(arg.message)
@@ -89,14 +89,16 @@ namespace Kaizo
 					var table = lua.CreateTable ();
 
 					foreach (var arg in args) {
-						var key = arg.Replace("\"", "").Replace("'", "").Split ('=');
+						var key = arg.Replace ("\"", "").Replace ("'", "").Split ('=');
 						table [key [0]] = key [1];
 					}
 
-					Call (task, table);
-				} else {
-					Call (task);
+					lua ["arg"] = table;
 				}
+
+				Call (task);
+			} else {
+				Call ("build");
 			}
 
 			lua.Dispose ();
