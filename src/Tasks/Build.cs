@@ -6,6 +6,7 @@ using Microsoft.Build.Execution;
 using Microsoft.Build.Logging;
 using NLua;
 using NuGet;
+using Microsoft.Build.Framework;
 
 namespace Kaizo.Tasks
 {
@@ -24,6 +25,8 @@ namespace Kaizo.Tasks
 			if (version == null) version = lua ["version"] as string;
 
 			var root = ProjectRootElement.Create ();
+			root.AddImport ("$(MSBuildBinPath)\\Microsoft.CSharp.targets");
+
 			var group = root.AddPropertyGroup ();
 			group.AddProperty ("Configuration", "Release");
 			group.AddProperty ("Platform", "x86");
@@ -37,12 +40,12 @@ namespace Kaizo.Tasks
 			group.AddProperty ("TargetFrameworkVersion", "v4.0");
 			group.AddProperty ("SchemaVersion", "2.0");
 
-			PackageManager packages = new PackageManager(
-				PackageRepositoryFactory.Default.CreateRepository("http://packages.nuget.org/api/v2"),
-				Path.Combine(Directory.GetCurrentDirectory(), "packages"));
+			var packages = new PackageManager(PackageRepositoryFactory.Default.CreateRepository("http://packages.nuget.org/api/v2"), "packages");
 
 			packages.PackageInstalled += delegate(object sender, PackageOperationEventArgs arg) {
+				Console.ForegroundColor = ConsoleColor.Magenta;
 				Console.WriteLine (" [DONE]");
+				Console.ResetColor();
 			};
 
 			packages.PackageInstalling += delegate(object sender, PackageOperationEventArgs arg) {
@@ -58,8 +61,9 @@ namespace Kaizo.Tasks
 			};
 
 			var references = root.AddItemGroup ();
+			var dependencies = (lua ["dependencies"] as LuaTable).Values;
 
-			foreach (string key in (lua ["dependencies"] as LuaTable).Values) {
+			foreach (string key in dependencies) {
 				if (key.IndexOf (':') > -1) {
 					var splitkey = key.Split (':');
 					packages.InstallPackage (splitkey [0], SemanticVersion.Parse (splitkey [1]));
@@ -91,10 +95,13 @@ namespace Kaizo.Tasks
 				}
 			}
 
-			root.AddImport ("$(MSBuildBinPath)\\Microsoft.CSharp.targets");
-			root.Save ("test.csproj");
 			ProjectInstance project = new ProjectInstance (root);
-			project.Build (new[] { new ConsoleLogger() });
+			ConsoleLogger logger = new ConsoleLogger(LoggerVerbosity.Minimal);
+			BuildManager manager = BuildManager.DefaultBuildManager;
+
+			manager.Build(
+				new BuildParameters() { DetailedSummary = true, Loggers = new[] { logger } }, 
+				new BuildRequestData(project, new string[] { "Build" }));
 
 			return project.FullPath;
 		}
