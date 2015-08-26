@@ -91,7 +91,7 @@ namespace Kaizo.Tasks
 					if (splitkey[1] == "*") {
 						packages.InstallPackage (splitkey [0]);
 						dependency = packages.LocalRepository.FindPackage (splitkey [0]);
-					} else { 
+					} else {
 						packages.InstallPackage (splitkey [0], SemanticVersion.Parse (splitkey [1]));
 						dependency = packages.LocalRepository.FindPackage (splitkey [0], SemanticVersion.Parse (splitkey [1]));
 					}
@@ -102,7 +102,7 @@ namespace Kaizo.Tasks
 								references.AddItem ("Reference", Path.GetFileNameWithoutExtension(reference.Name),
 									new KeyValuePair<string, string>[] {
 										new KeyValuePair<string, string> (
-											"HintPath", 
+											"HintPath",
 											Path.Combine ("packages", dependency.Id + "." + dependency.Version.ToString(), reference.Path))
 									}
 								);
@@ -127,7 +127,7 @@ namespace Kaizo.Tasks
 			BuildManager manager = BuildManager.DefaultBuildManager;
 
 			manager.Build(
-				new BuildParameters() { DetailedSummary = true, Loggers = new[] { logger } }, 
+				new BuildParameters() { DetailedSummary = true, Loggers = new[] { logger } },
 				new BuildRequestData(project, new string[] { "Build" }));
 
 			return project.FullPath;

@@ -15,7 +15,7 @@ namespace Kaizo
 		{
 			return (LuaTable)lua.DoString("return {}")[0];
 		}
-	} 
+	}
 
 	class MainClass
 	{
@@ -26,7 +26,7 @@ namespace Kaizo
 				name = 'kaizo'
 				version = '0.0.1'
 				namespace = 'Kaizo'
-				
+
 				csharp = {
 					type = 'exe',
 					source = '../../src',
