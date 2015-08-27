@@ -36,5 +36,5 @@ dependencies = {
 And to build it, you will simply run this from console:
 
 ```shell
-./kaizo self.compile
+./kaizo self.build
 ```
