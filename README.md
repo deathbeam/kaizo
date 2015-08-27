@@ -1,4 +1,4 @@
-# Kaizo [![Build Status](https://travis-ci.org/nondev/kaizo.svg?branch=master)](https://travis-ci.org/nondev/kaizo) 
+# Kaizo [![Build Status](https://travis-ci.org/nondev/kaizo.svg?branch=master)](https://travis-ci.org/nondev/kaizo)
 > A powerful build system for the CLR
 
 <img src="http://i.imgur.com/S1oVruZ.png" alt="Terminal demo" title="Terminal demo" align="center" width="100%"/>
@@ -17,7 +17,7 @@ namespace = 'Kaizo'
 csharp = {
 	type = 'exe',
 	source = '../kaizo/src',
-	output = 'out',
+	output = 'bin',
 	resources = 'res',
 	configuration = 'Release',
 	namespace = 'Kaizo',
@@ -34,10 +34,15 @@ dependencies = {
 	'Mono.NuGet.Core:*',
 	'Microsoft.Web.Xdt:*'
 }
+
+function compile()
+	task('self.clean')
+	task('self.build')
+end
 ```
 
 And to build it, simply navigate to bootstrap directory and run this from console:
 
 ```shell
-./kaizow self.build
+./kaizow self.compile
 ```
