@@ -16,9 +16,9 @@ namespace Kaizo
 
 		public static void Main (string[] args)
 		{
-			args = new[] { "project.compile", "-arg", "message=hello" };
+			args = new[] { "kaizo.compile", "-arg", "message=hello" };
 			string file = @"
-				module('project', package.seeall)
+				project('kaizo')
 
 				name = 'kaizo'
 				version = '0.0.1'
@@ -50,8 +50,8 @@ namespace Kaizo
 				} end
 
 				function compile()
-					task('project.copydll')
-					task('project.build')
+					task('kaizo.copydll')
+					task('kaizo.build')
 					print(arg.message)
 				end
 			";
@@ -61,6 +61,11 @@ namespace Kaizo
 
 			lua = new Lua ();
 			lua.LoadCLRPackage ();
+			lua.DoString (@"
+				function project(name)
+					return module(name, package.seeall)
+				end
+			");
 
 			var tasks = Assembly.GetExecutingAssembly().GetTypes().Where(
 				t => String.Equals(t.Namespace, "Kaizo.Tasks", StringComparison.Ordinal) &&
