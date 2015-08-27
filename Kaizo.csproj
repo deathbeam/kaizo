@@ -55,6 +55,7 @@
     <Compile Include="src\Extensions.cs" />
     <Compile Include="src\Tasks\Move.cs" />
     <Compile Include="src\Tasks\Task.cs" />
+    <Compile Include="src\Logger.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

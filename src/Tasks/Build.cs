@@ -59,6 +59,8 @@ namespace Kaizo.Tasks
 			group.AddProperty ("TargetFrameworkVersion", framework);
 			group.AddProperty ("SchemaVersion", "2.0");
 
+			Logger.Log (project + ".dependencies", ConsoleColor.Magenta);
+
 			var packages = new PackageManager(PackageRepositoryFactory.Default.CreateRepository("http://packages.nuget.org/api/v2"), "packages");
 
 			packages.PackageInstalled += delegate(object sender, PackageOperationEventArgs arg) {
@@ -68,7 +70,7 @@ namespace Kaizo.Tasks
 			};
 
 			packages.PackageInstalling += delegate(object sender, PackageOperationEventArgs arg) {
-				Console.Write ("Installing " + arg.Package.GetFullName() + "...");
+				Console.Write ("Installing " + arg.Package.GetFullName());
 			};
 
 			var references = root.AddItemGroup ();

@@ -16,9 +16,9 @@ namespace Kaizo
 
 		public static void Main (string[] args)
 		{
-			args = new[] { "kaizo.build" };
+			args = new[] { "root.build" };
 			string file = @"
-				project('kaizo')
+				project('root')
 
 				name = 'kaizo'
 				version = '0.0.1'
@@ -46,7 +46,7 @@ namespace Kaizo
 			";
 
 			time.Start ();
-			Print("> ", "Build started", ConsoleColor.Magenta);
+			Logger.Log("Build started", ConsoleColor.Magenta, "> ");
 
 			lua = new Lua ();
 			lua.LoadCLRPackage ();
@@ -100,24 +100,16 @@ namespace Kaizo
 
 			lua.Dispose ();
 			time.Stop ();
-			Print("> ", "Build succesfull", ConsoleColor.Green);
-			Print("> ", "Finished in " + time.Elapsed.ToReadableString(), ConsoleColor.Green);
-		}
-
-		public static void Print(string separator, string message, ConsoleColor color)
-		{
-			Console.ForegroundColor = color;
-			Console.Write (separator);
-			Console.ResetColor ();
-			Console.WriteLine (message);
+			Logger.Log("Build succesfull", ConsoleColor.Green, "> ");
+			Logger.Log("Finished in " + time.Elapsed.ToReadableString(), ConsoleColor.Green, "> ");
 		}
 
 		public static void Fail(Exception e) {
 			lua.Dispose ();
 			time.Stop ();
-			Print("> ", "Build failed with error:", ConsoleColor.Red);
+			Logger.Log("Build failed with error:", ConsoleColor.Red, "> ");
 			Console.WriteLine (e);
-			Print("> ", "Finished in " + time.Elapsed.ToReadableString(), ConsoleColor.Red);
+			Logger.Log("Finished in " + time.Elapsed.ToReadableString(), ConsoleColor.Red, "> ");
 			Environment.Exit (-1);
 		}
 
@@ -127,7 +119,7 @@ namespace Kaizo
 
 		public static object Call(string name, LuaTable args = null)
 		{
-			Print (":", name, ConsoleColor.Magenta);
+			Logger.Log(name, ConsoleColor.Magenta);
 			var task = lua.GetFunction (name);
 			object result = null;
 
