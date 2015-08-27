@@ -6,7 +6,7 @@
 Here is example `project.lua` what will build **Kaizo** itself:
 
 ```lua
-project('kaizo')
+project('root')
 
 name = 'kaizo'
 version = '0.0.1'
@@ -31,4 +31,10 @@ dependencies = {
 	'Mono.NuGet.Core:*',
 	'Microsoft.Web.Xdt:*'
 }
+```
+
+And to build it, you will simply run this from console:
+
+```shell
+./kaizo root.compile
 ```
