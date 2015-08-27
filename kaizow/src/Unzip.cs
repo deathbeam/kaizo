@@ -398,7 +398,6 @@ namespace Internals
 			// read directory properties
 			Stream.Seek(6, SeekOrigin.Current);
 			var entries = Reader.ReadUInt16();
-			var difSize = Reader.ReadInt32();
 			var dirOffset = Reader.ReadUInt32();
 			Stream.Seek(dirOffset, SeekOrigin.Begin);
 
@@ -422,7 +421,6 @@ namespace Internals
 				short fileNameSize = Reader.ReadInt16();
 				short extraSize = Reader.ReadInt16();
 				short commentSize = Reader.ReadInt16();
-				int headerOffset = Reader.ReadInt32();
 				Reader.ReadInt32();
 				int fileHeaderOffset = Reader.ReadInt32();
 				var fileNameBytes = Reader.ReadBytes(fileNameSize);

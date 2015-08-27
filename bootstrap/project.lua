@@ -6,7 +6,7 @@ namespace = 'Kaizo'
 
 csharp = {
 	type = 'exe',
-	source = 'src',
+	source = '../kaizo/src',
 	output = 'bin',
 	configuration = 'Release',
 	namespace = 'Kaizo',
