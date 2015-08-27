@@ -24,3 +24,8 @@ dependencies = {
 	'Mono.NuGet.Core:*',
 	'Microsoft.Web.Xdt:*'
 }
+
+function compile()
+	task('self.clean')
+	task('self.build')
+end
