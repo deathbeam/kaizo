@@ -16,8 +16,10 @@ namespace Kaizo
 
 		public static void Main (string[] args)
 		{
-			args = new[] { "compile", "-arg", "message=hello" };
+			args = new[] { "project.compile", "-arg", "message=hello" };
 			string file = @"
+				module('project', package.seeall)
+
 				name = 'kaizo'
 				version = '0.0.1'
 				namespace = 'Kaizo'
@@ -42,16 +44,14 @@ namespace Kaizo
 					'Microsoft.Web.Xdt:*'
 				}
 
-				function copydll()
-					copy{
-						from = 'NLua.dll',
-						to = 'packages/NLua.dll'
-					}
-				end
+				function copydll() copy{
+					from = 'NLua.dll',
+					to = 'packages/NLua.dll'
+				} end
 
 				function compile()
-					task('copydll')
-					task('build')
+					task('project.copydll')
+					task('project.build')
 					print(arg.message)
 				end
 			";
@@ -102,8 +102,6 @@ namespace Kaizo
 				foreach (var cmdtask in cmdtasks) {
 					Call (cmdtask);
 				}
-			} else {
-				Call ("build");
 			}
 
 			lua.Dispose ();
@@ -139,11 +137,13 @@ namespace Kaizo
 			var task = lua.GetFunction (name);
 			object result = null;
 
+			var project = name.Split ('.')[0];
+
 			try {
 				if (args != null) {
-					result = task.Call (args);
+					result = task.Call (project, args);
 				} else {
-					result = task.Call ();
+					result = task.Call (project);
 				}
 			} catch (Exception e) {
 				Fail (e);

@@ -8,8 +8,8 @@ namespace Kaizo.Tasks
 	{
 		public Copy(Lua lua) : base(lua) { }
 
-		public override object Execute(LuaTable args) {
-			if (args == null) return null;
+		public void Run(LuaTable args) {
+			if (args == null) return;
 
 			var copyTo = args ["to"] as string;
 			var copyFrom = args ["from"];
@@ -21,8 +21,6 @@ namespace Kaizo.Tasks
 			} else {
 				CopyIt (copyFrom as string, copyTo);
 			}
-
-			return null;
 		}
 
 		private void CopyIt(string src, string dest) {

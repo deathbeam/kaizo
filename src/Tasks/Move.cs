@@ -8,8 +8,8 @@ namespace Kaizo.Tasks
 	{
 		public Move(Lua lua) : base(lua) { }
 
-		public override object Execute(LuaTable args) {
-			if (args == null) return null;
+		public void Run(LuaTable args) {
+			if (args == null) return;
 
 			var moveTo = args ["to"] as string;
 			var moveFrom = args ["from"];
@@ -21,8 +21,6 @@ namespace Kaizo.Tasks
 			} else {
 				MoveIt (moveFrom as string, moveTo);
 			}
-
-			return null;
 		}
 
 		private void MoveIt(string src, string dest) {

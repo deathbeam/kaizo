@@ -18,11 +18,5 @@ namespace Kaizo.Tasks
 			Get[name] = this;
 			lua.RegisterFunction(name, this, method);
 		}
-
-		public object Run(LuaTable args = null) {
-			return Execute (args);
-		}
-
-		public abstract object Execute(LuaTable args);
 	}
 }

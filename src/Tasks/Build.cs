@@ -14,32 +14,32 @@ namespace Kaizo.Tasks
 	{
 		public Build(Lua lua) : base(lua) { }
 
-		public override object Execute(LuaTable args) {
-			var name = lua ["name"] as string;
+		public void Run(string project) {
+			var name = lua [project + ".name"] as string;
 			if (name == null) name = "project";
 
-			var version = lua ["version"] as string;
+			var version = lua [project + ".version"] as string;
 			if (version == null) version = "1.0.0";
 
-			var nspace = lua ["csharp.namespace"] as string;
+			var nspace = lua [project + ".csharp.namespace"] as string;
 			if (nspace == null) nspace = name;
 
-			var configuration = lua ["csharp.configuration"] as string;
+			var configuration = lua [project + ".csharp.configuration"] as string;
 			if (configuration == null) configuration = "Release";
 
-			var platform = lua ["csharp.platform"] as string;
+			var platform = lua [project + ".csharp.platform"] as string;
 			if (platform == null) platform = "anycpu";
 
-			var type = lua ["csharp.type"] as string;
+			var type = lua [project + ".csharp.type"] as string;
 			if (type == null) type = "exe";
 
-			var source = lua ["csharp.source"] as string;
+			var source = lua [project + ".csharp.source"] as string;
 			if (source == null) source = "src";
 
-			var output = lua ["csharp.output"] as string;
+			var output = lua [project + ".csharp.output"] as string;
 			if (output == null) output = "out";
 
-			var framework = lua ["csharp.framework"] as string;
+			var framework = lua [project + ".csharp.framework"] as string;
 			if (framework == null) framework = "v4.0";
 
 			var root = ProjectRootElement.Create ();
@@ -72,7 +72,7 @@ namespace Kaizo.Tasks
 			};
 
 			var references = root.AddItemGroup ();
-			var dependencies = (lua ["dependencies"] as LuaTable).Values;
+			var dependencies = (lua [project + ".dependencies"] as LuaTable).Values;
 
 			foreach (string key in dependencies) {
 				if (key.IndexOf (':') > -1) {
@@ -114,15 +114,13 @@ namespace Kaizo.Tasks
 				}
 			}
 
-			ProjectInstance project = new ProjectInstance (root);
+			ProjectInstance projectInstance = new ProjectInstance (root);
 			ConsoleLogger logger = new ConsoleLogger(LoggerVerbosity.Quiet);
 			BuildManager manager = BuildManager.DefaultBuildManager;
 
 			manager.Build(
 				new BuildParameters() { DetailedSummary = true, Loggers = new[] { logger } },
-				new BuildRequestData(project, new string[] { "Build" }));
-
-			return project.FullPath;
+				new BuildRequestData(projectInstance, new string[] { "Build" }));
 		}
 	}
 }
