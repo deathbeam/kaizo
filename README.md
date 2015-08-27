@@ -1,6 +1,5 @@
-# Kaizo
+# Kaizo [![Build Status](https://travis-ci.org/nondev/kaizo.svg?branch=master)](https://travis-ci.org/nondev/kaizo) 
 > A powerful build system for the CLR
-
 
 <img src="http://i.imgur.com/S1oVruZ.png" alt="Terminal demo" title="Terminal demo" align="center" width="100%"/>
 
