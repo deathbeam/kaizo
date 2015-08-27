@@ -16,35 +16,6 @@ namespace Kaizo
 
 		public static void Main (string[] args)
 		{
-			args = new[] { "root.build" };
-			string file = @"
-				project('root')
-
-				name = 'kaizo'
-				version = '0.0.1'
-				namespace = 'Kaizo'
-
-				csharp = {
-					type = 'exe',
-					source = '../../src',
-					output = 'out',
-					configuration = 'Release',
-					namespace = 'Kaizo',
-					platform = 'x86',
-					framework = 'v4.0'
-				}
-
-				dependencies = {
-					'System',
-					'System.Core',
-					'Microsoft.Build',
-					'Microsoft.Build.Framework',
-					'NLua_Safe:*',
-					'Mono.NuGet.Core:*',
-					'Microsoft.Web.Xdt:*'
-				}
-			";
-
 			time.Start ();
 			Logger.Log("Build started", ConsoleColor.Magenta, "> ");
 
@@ -67,7 +38,7 @@ namespace Kaizo
 			lua.RegisterFunction ("task", typeof(MainClass).GetMethod("CallTask"));
 
 			try {
-				lua.DoString (file); //lua.DoFile (Path.Combine(Directory.GetCurrentDirectory(), "project.lua"));
+				lua.DoFile ("project.lua");
 			} catch (Exception e) {
 				Fail (e);
 			}
