@@ -1,7 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kaizo", "Kaizo.csproj", "{7353EDCE-C41F-4498-8D91-A03A970A0F6F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kaizo", "kaizo\Kaizo.csproj", "{7353EDCE-C41F-4498-8D91-A03A970A0F6F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kaizow", "kaizow\Kaizow.csproj", "{B97AFB66-F269-4141-A61F-DC022564667A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,5 +15,9 @@ Global
 		{7353EDCE-C41F-4498-8D91-A03A970A0F6F}.Debug|x86.Build.0 = Debug|x86
 		{7353EDCE-C41F-4498-8D91-A03A970A0F6F}.Release|x86.ActiveCfg = Release|x86
 		{7353EDCE-C41F-4498-8D91-A03A970A0F6F}.Release|x86.Build.0 = Release|x86
+		{B97AFB66-F269-4141-A61F-DC022564667A}.Debug|x86.ActiveCfg = Debug|x86
+		{B97AFB66-F269-4141-A61F-DC022564667A}.Debug|x86.Build.0 = Debug|x86
+		{B97AFB66-F269-4141-A61F-DC022564667A}.Release|x86.ActiveCfg = Release|x86
+		{B97AFB66-F269-4141-A61F-DC022564667A}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 EndGlobal

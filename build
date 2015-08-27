@@ -1,3 +1,2 @@
-nuget restore && xbuild /p:Configuration=Release
-# ./kaizo self.build
-mkbundle -o bootstrap/kaizo --static bin/Release/kaizo.exe bin/Release/kaizo.exe bin/Release/KopiLua.dll bin/Release/Microsoft.Web.XmlTransform.dll bin/Release/NLua.dll bin/Release/NuGet.Core.dll
+nuget restore
+xbuild /p:Configuration=Release
