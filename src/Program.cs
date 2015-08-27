@@ -16,7 +16,7 @@ namespace Kaizo
 
 		public static void Main (string[] args)
 		{
-			args = new[] { "kaizo.compile", "-arg", "message=hello" };
+			args = new[] { "kaizo.build" };
 			string file = @"
 				project('kaizo')
 
@@ -43,17 +43,6 @@ namespace Kaizo
 					'Mono.NuGet.Core:*',
 					'Microsoft.Web.Xdt:*'
 				}
-
-				function copydll() copy{
-					from = 'NLua.dll',
-					to = 'packages/NLua.dll'
-				} end
-
-				function compile()
-					task('kaizo.copydll')
-					task('kaizo.build')
-					print(arg.message)
-				end
 			";
 
 			time.Start ();
