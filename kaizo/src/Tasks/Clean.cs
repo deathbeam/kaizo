@@ -14,8 +14,8 @@ namespace Kaizo.Tasks
 			var resources = lua [project + ".csharp.resources"] as string;
 			if (resources == null) resources = "res";
 
-			Directory.Delete(output, true);
-			Directory.Delete(resources, true);
+			if (Directory.Exists(output)) Directory.Delete(output, true);
+			if (Directory.Exists(resources)) Directory.Delete(resources, true);
     }
 	}
 }
