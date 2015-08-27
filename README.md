@@ -14,7 +14,7 @@ namespace = 'Kaizo'
 
 csharp = {
 	type = 'exe',
-	source = 'src',
+	source = '../kaizo/src',
 	output = 'out',
 	configuration = 'Release',
 	namespace = 'Kaizo',
@@ -33,8 +33,8 @@ dependencies = {
 }
 ```
 
-And to build it, you will simply run this from console:
+And to build it, simply navigate to bootstrap directory and run this from console:
 
 ```shell
-./kaizo self.build
+./kaizow self.build
 ```
