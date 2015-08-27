@@ -1,7 +1,9 @@
 # Kaizo
 > A powerful build system for the CLR
 
-Kaizo is build automation tool for [CLR](https://en.wikipedia.org/wiki/Common_Language_Runtime). It is using Lua as build script language. Right now, it is in very early development, but it will work on Windows, Linux and Mac. Kaizo is inspired by [Gradle](https://gradle.org/) for Java.
+**Kaizo** is build automation tool for [CLR](https://en.wikipedia.org/wiki/Common_Language_Runtime). It is using Lua as build script language. Right now, it is in very early development, but it will work on Windows, Linux and Mac. Kaizo is inspired by [Gradle](https://gradle.org/) for Java.
+
+Here is example `project.lua` what will build **Kaizo** itself:
 
 ```lua
 project('kaizo')
