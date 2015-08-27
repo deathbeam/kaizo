@@ -54,6 +54,7 @@
     <Compile Include="src\Tasks\Build.cs" />
     <Compile Include="src\Tasks\Copy.cs" />
     <Compile Include="src\Extensions.cs" />
+    <Compile Include="src\Tasks\Move.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

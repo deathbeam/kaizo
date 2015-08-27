@@ -71,14 +71,6 @@ namespace Kaizo.Tasks
 				Console.Write ("Installing " + arg.Package.GetFullName() + "...");
 			};
 
-			packages.PackageUninstalled += delegate(object sender, PackageOperationEventArgs arg) {
-
-			};
-
-			packages.PackageUninstalling += delegate(object sender, PackageOperationEventArgs arg) {
-
-			};
-
 			var references = root.AddItemGroup ();
 			var dependencies = (lua ["dependencies"] as LuaTable).Values;
 
