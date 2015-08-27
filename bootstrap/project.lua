@@ -8,6 +8,7 @@ csharp = {
 	type = 'exe',
 	source = '../kaizo/src',
 	output = 'bin',
+	resources = 'res',
 	configuration = 'Release',
 	namespace = 'Kaizo',
 	platform = 'x86',

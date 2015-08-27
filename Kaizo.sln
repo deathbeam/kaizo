@@ -20,4 +20,8 @@ Global
 		{B97AFB66-F269-4141-A61F-DC022564667A}.Release|x86.ActiveCfg = Release|x86
 		{B97AFB66-F269-4141-A61F-DC022564667A}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		description = A powerful build system for the CLR
+		version = 0.0.1
+	EndGlobalSection
 EndGlobal

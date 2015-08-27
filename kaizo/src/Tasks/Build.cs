@@ -39,6 +39,9 @@ namespace Kaizo.Tasks
 			var output = lua [project + ".csharp.output"] as string;
 			if (output == null) output = "out";
 
+			var resources = lua [project + ".csharp.resources"] as string;
+			if (resources == null) resources = "res";
+
 			var framework = lua [project + ".csharp.framework"] as string;
 			if (framework == null) framework = "v4.0";
 
@@ -93,13 +96,9 @@ namespace Kaizo.Tasks
 					foreach (var reference in dependency.AssemblyReferences) {
 						foreach (var frmwrk in reference.SupportedFrameworks) {
 							if (frmwrk.Version == new Version (4, 0)) {
-								references.AddItem ("Reference", Path.GetFileNameWithoutExtension(reference.Name),
-									new KeyValuePair<string, string>[] {
-										new KeyValuePair<string, string> (
-											"HintPath",
-											Path.Combine ("packages", dependency.Id + "." + dependency.Version.ToString(), reference.Path))
-									}
-								);
+								references
+									.AddItem ("Reference", Path.GetFileNameWithoutExtension (reference.Name))
+									.AddMetadata ("HintPath", Path.Combine ("packages", dependency.Id + "." + dependency.Version.ToString (), reference.Path));
 							}
 						}
 					}
@@ -113,6 +112,14 @@ namespace Kaizo.Tasks
 
 				foreach (var file in Directory.GetFiles (source, "*.cs", SearchOption.AllDirectories)) {
 					compile.AddItem ("Compile", file);
+				}
+			}
+
+			if (Directory.Exists (resources)) {
+				var none = root.AddItemGroup ();
+
+				foreach (var file in Directory.GetFiles (source, "*", SearchOption.AllDirectories)) {
+					none.AddItem ("None", file).AddMetadata ("CopyToOutputDirectory", "PreserveNewest");
 				}
 			}
 
