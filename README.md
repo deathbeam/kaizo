@@ -6,7 +6,7 @@
 Here is example `project.lua` what will build **Kaizo** itself:
 
 ```lua
-project('root')
+project('self')
 
 name = 'kaizo'
 version = '0.0.1'
@@ -14,7 +14,7 @@ namespace = 'Kaizo'
 
 csharp = {
 	type = 'exe',
-	source = '../../src',
+	source = 'src',
 	output = 'out',
 	configuration = 'Release',
 	namespace = 'Kaizo',
@@ -36,5 +36,5 @@ dependencies = {
 And to build it, you will simply run this from console:
 
 ```shell
-./kaizo root.compile
+./kaizo self.compile
 ```
