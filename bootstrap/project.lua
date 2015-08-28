@@ -15,13 +15,17 @@ configuration = {
 }
 
 dependencies = {
-	'System',
-	'System.Core',
-	'Microsoft.Build',
-	'Microsoft.Build.Framework',
-	'NLua_Safe:*',
-	'Mono.NuGet.Core:*',
-	'Microsoft.Web.Xdt:*'
+	system = {
+		'System',
+		'System.Core',
+		'Microsoft.Build',
+		'Microsoft.Build.Framework'
+	},
+	nuget = {
+		'NLua_Safe',
+		'Mono.NuGet.Core',
+		'Microsoft.Web.Xdt'
+	}
 }
 
 function compile()

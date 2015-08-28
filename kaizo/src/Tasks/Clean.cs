@@ -8,7 +8,7 @@ namespace Kaizo.Tasks
     public Clean(Lua lua) : base(lua) { }
 
     public void Run(string project) {
-      var output = lua [project + ".csharp.output"] as string;
+      var output = lua [project + ".configuration.output"] as string;
       if (output == null) output = "out";
 
       if (Directory.Exists(output)) Directory.Delete(output, true);

@@ -76,20 +76,28 @@ namespace Kaizo.Tasks
 			};
 
 			var references = root.AddItemGroup ();
-			var dependencies = (lua [project + ".dependencies"] as LuaTable).Values;
+			var dependencies = lua [project + ".dependencies.system"];
 
-			foreach (string key in dependencies) {
-				if (key.IndexOf (':') > -1) {
-					var splitkey = key.Split (':');
+			if (dependencies != null) {
+				foreach (string dep in (dependencies as LuaTable).Values) {
+					references.AddItem("Reference", dep);
+				}
+			}
 
+			dependencies = lua [project + ".dependencies.nuget"];
+
+			if (dependencies != null) {
+				foreach (string dep in (dependencies as LuaTable).Values) {
 					IPackage dependency = null;
 
-					if (splitkey[1] == "*") {
-						packages.InstallPackage (splitkey [0]);
-						dependency = packages.LocalRepository.FindPackage (splitkey [0]);
+					if (dep.IndexOf (':') > -1) {
+						var splitdep = dep.Split (':');
+						packages.InstallPackage (splitdep [0], SemanticVersion.Parse (splitdep [1]));
+						dependency = packages.LocalRepository.FindPackage (splitdep [0], SemanticVersion.Parse (splitdep [1]));
+
 					} else {
-						packages.InstallPackage (splitkey [0], SemanticVersion.Parse (splitkey [1]));
-						dependency = packages.LocalRepository.FindPackage (splitkey [0], SemanticVersion.Parse (splitkey [1]));
+						packages.InstallPackage (dep);
+						dependency = packages.LocalRepository.FindPackage (dep);
 					}
 
 					foreach (var reference in dependency.AssemblyReferences) {
@@ -101,8 +109,17 @@ namespace Kaizo.Tasks
 							}
 						}
 					}
-				} else {
-					references.AddItem("Reference", key);
+				}
+			}
+
+			dependencies = lua [project + ".dependencies.project"];
+
+			if (dependencies != null) {
+				var projects = root.AddItemGroup();
+
+				foreach (string dep in (dependencies as LuaTable).Values) {
+					MainClass.Call(dep + ".build");
+					projects.AddItem("ProjectReference", dep + ".csproj").AddMetadata("name", dep);
 				}
 			}
 
