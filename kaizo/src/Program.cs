@@ -22,6 +22,8 @@ namespace Kaizo
 			lua = new Lua ();
 			lua.LoadCLRPackage ();
 			lua.DoString (@"
+				package.path = package.path..';./?/project.lua'
+
 				function project(name)
 					return module(name, package.seeall)
 				end
