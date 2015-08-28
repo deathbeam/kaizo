@@ -21,36 +21,35 @@ namespace Kaizo.Tasks
 			var version = lua [project + ".version"] as string;
 			if (version == null) version = "1.0.0";
 
-			var nspace = lua [project + ".csharp.namespace"] as string;
+			var nspace = lua [project + ".configuration.namespace"] as string;
 			if (nspace == null) nspace = name;
 
-			var configuration = lua [project + ".csharp.configuration"] as string;
-			if (configuration == null) configuration = "Release";
+			var deploy = lua [project + ".configuration.deploy"] as string;
+			if (deploy == null) deploy = "Release";
 
-			var platform = lua [project + ".csharp.platform"] as string;
+			var platform = lua [project + ".configuration.platform"] as string;
 			if (platform == null) platform = "anycpu";
 
-			var type = lua [project + ".csharp.type"] as string;
+			var type = lua [project + ".configuration.type"] as string;
 			if (type == null) type = "exe";
 
-			var source = lua [project + ".csharp.source"] as string;
+			var source = lua [project + ".configuration.source"] as string;
 			if (source == null) source = "src";
 
-			var output = lua [project + ".csharp.output"] as string;
+			var output = lua [project + ".configuration.output"] as string;
 			if (output == null) output = "out";
 
-			var resources = lua [project + ".csharp.resources"] as string;
+			var resources = lua [project + ".configuration.resources"] as string;
 			if (resources == null) resources = "res";
 
-			var framework = lua [project + ".csharp.framework"] as string;
+			var framework = lua [project + ".configuration.framework"] as string;
 			if (framework == null) framework = "v4.0";
 
 			var root = ProjectRootElement.Create ();
-			root.AddImport ("$(MSBuildBinPath)\\Microsoft.CSharp.targets");
-
+			root.AddImport ("$(MSBuildBinPath)\\Microsoft.configuration.targets");
 
 			var group = root.AddPropertyGroup ();
-			group.AddProperty ("Configuration", configuration);
+			group.AddProperty ("Configuration", deploy);
 			group.AddProperty ("Platform", platform);
 			group.AddProperty ("PlatformTarget", platform);
 			group.AddProperty ("RootNamespace", nspace);
@@ -124,6 +123,7 @@ namespace Kaizo.Tasks
 			}
 
 			ProjectInstance projectInstance = new ProjectInstance (root);
+			root.Save(Path.Combine(output, name + ".csproj"));
 			ConsoleLogger logger = new ConsoleLogger(LoggerVerbosity.Quiet);
 			BuildManager manager = BuildManager.DefaultBuildManager;
 

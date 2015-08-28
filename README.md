@@ -12,14 +12,13 @@ project('self')
 
 name = 'kaizo'
 version = '0.0.1'
-namespace = 'Kaizo'
 
-csharp = {
+configuration = {
 	type = 'exe',
 	source = '../kaizo/src',
 	output = 'bin',
 	resources = 'res',
-	configuration = 'Release',
+	deploy = 'Release',
 	namespace = 'Kaizo',
 	platform = 'x86',
 	framework = 'v4.0'
