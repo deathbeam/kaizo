@@ -12,6 +12,7 @@ namespace Kaizo.Tasks
       if (output == null) output = "out";
 
       if (Directory.Exists(output)) Directory.Delete(output, true);
+      if (Directory.Exists("obj")) Directory.Delete("obj", true);
     }
   }
 }

@@ -6,6 +6,7 @@
 [Bb]in/
 packages/
 TestResults/
+bootstrap/kaizo.csproj
 
 # globs
 Makefile.in
