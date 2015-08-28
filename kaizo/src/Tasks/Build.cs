@@ -46,7 +46,7 @@ namespace Kaizo.Tasks
 			if (framework == null) framework = "v4.0";
 
 			var root = ProjectRootElement.Create ();
-			root.AddImport ("$(MSBuildBinPath)\\Microsoft.configuration.targets");
+			root.AddImport ("$(MSBuildBinPath)\\Microsoft.CSharp.targets");
 
 			var group = root.AddPropertyGroup ();
 			group.AddProperty ("Configuration", deploy);
@@ -119,7 +119,7 @@ namespace Kaizo.Tasks
 
 				foreach (string dep in (dependencies as LuaTable).Values) {
 					MainClass.Call(dep + ".build");
-					projects.AddItem("ProjectReference", dep + ".csproj").AddMetadata("name", dep);
+					projects.AddItem("ProjectReference", dep).AddMetadata("name", dep);
 				}
 			}
 
@@ -140,7 +140,7 @@ namespace Kaizo.Tasks
 			}
 
 			ProjectInstance projectInstance = new ProjectInstance (root);
-			root.Save(Path.Combine(output, name + ".csproj"));
+			root.Save(name + ".csproj");
 			ConsoleLogger logger = new ConsoleLogger(LoggerVerbosity.Quiet);
 			BuildManager manager = BuildManager.DefaultBuildManager;
 
