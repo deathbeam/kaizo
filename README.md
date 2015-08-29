@@ -12,7 +12,6 @@ You must have [Git](http://git.com) and [Mono](https://mono.org) installed.
 ```bash
 git clone "https://github.com/nondev/kaizo.git"
 cd kaizo && ./install && cd bootstrap
-mkdir $YOUR_PROJECT_DIRECTORY
 cp kaizow $YOUR_PROJECT_DIRECTORY
 cp kaizow.bat $YOUR_PROJECT_DIRECTORY
 cp kaizow.exe $YOUR_PROJECT_DIRECTORY
@@ -25,10 +24,9 @@ git clone "https://github.com/nondev/kaizo.git"
 cd kaizo
 install
 cd bootstrap
-mkdir %YOUR_PROJECT_DIRECTORY%
-copy kaizow %YOUR_PROJECT_DIRECTORY%
-copy kaizow.bat %YOUR_PROJECT_DIRECTORY%
-copy kaizow.exe %YOUR_PROJECT_DIRECTORY%
+xcopy kaizow %YOUR_PROJECT_DIRECTORY%
+xcopy kaizow.bat %YOUR_PROJECT_DIRECTORY%
+xcopy kaizow.exe %YOUR_PROJECT_DIRECTORY%
 ```
 
 ### Example
