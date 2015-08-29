@@ -98,6 +98,15 @@ namespace Kaizo.Tasks
 
 			dependencies = lua [project + ".dependencies.project"] as LuaTable;
 
+			if (dependencies != null) {
+				var projects = root.AddItemGroup();
+
+				foreach (string dep in (dependencies as LuaTable).Values) {
+					Task.Call(dep + ".build");
+					projects.AddItem("ProjectReference", dep).AddMetadata("name", dep);
+				}
+			}
+
 			if (Directory.Exists (source)) {
 				var compile = root.AddItemGroup ();
 
@@ -115,7 +124,7 @@ namespace Kaizo.Tasks
 			}
 
 			ProjectInstance projectInstance = new ProjectInstance (root);
-			ConsoleLogger logger = new ConsoleLogger(LoggerVerbosity.Minimal);
+			ConsoleLogger logger = new ConsoleLogger(LoggerVerbosity.Normal);
 			BuildManager manager = BuildManager.DefaultBuildManager;
 
 			manager.Build(

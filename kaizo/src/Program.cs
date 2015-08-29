@@ -20,7 +20,7 @@ namespace Kaizo
       if (args.Length > 0) {
         if (args [0] == "help") {
           Logger.Log ("Available commands:", ConsoleColor.Magenta, "> ");
-          Logger.Log ("help \t                    - display this help message", ConsoleColor.Magenta, "./kaizow ");
+          Logger.Log ("help                       - display this help message", ConsoleColor.Magenta, "./kaizow ");
           Logger.Log ("update (<directory>)       - update kaizo from git repository or from <directory>", ConsoleColor.Magenta, "./kaizow ");
           Logger.Log ("<tasks> (-arg <arguments>) - run <tasks> with optional <arguments>", ConsoleColor.Magenta, "./kaizow ");
           return;
@@ -32,6 +32,15 @@ namespace Kaizo
 
 			time.Start ();
 			Logger.Log("Build started", ConsoleColor.Magenta, "> ");
+
+      if (args.Contains("-d")) {
+        var arglist = new List<string>(args);
+        int index = arglist.IndexOf("-d");
+        Directory.SetCurrentDirectory(arglist[index + 1]);
+        arglist.RemoveAt(index);
+        arglist.RemoveAt(index);
+        args = arglist.ToArray();
+      }
 
 			lua = new Lua ();
 			lua.LoadCLRPackage ();
@@ -104,11 +113,13 @@ namespace Kaizo
       Logger.Log("Finished in " + time.Elapsed.ToReadableString(), ConsoleColor.Magenta, "> ");
 		}
 
-    public static Lua GetLua() {
+    public static Lua GetLua()
+    {
       return lua;
     }
 
-    public static void Fail(Exception e) {
+    public static void Fail(Exception e)
+    {
       if (e is LuaScriptException) {
         var le = e as LuaScriptException;
 

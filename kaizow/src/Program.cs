@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using Internals;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace Kaizow
 {
@@ -67,16 +68,19 @@ namespace Kaizow
 				if (doUpdate) return;
 			}
 
-			if (File.Exists("kaizo.exe")) {
-				BOOT = Directory.GetCurrentDirectory();
-			}
+      Assembly.LoadFile(Path.Combine(BOOT, "KopiLua.dll"));
+      Assembly.LoadFile(Path.Combine(BOOT, "Microsoft.Web.XmlTransform.dll"));
+      Assembly.LoadFile(Path.Combine(BOOT, "NLua.dll"));
+      Assembly.LoadFile(Path.Combine(BOOT, "NuGet.Core.dll"));
 
-			Assembly.Load(File.ReadAllBytes(Path.Combine(BOOT, "KopiLua.dll")));
-			Assembly.Load(File.ReadAllBytes(Path.Combine(BOOT, "Microsoft.Web.XmlTransform.dll")));
-			Assembly.Load(File.ReadAllBytes(Path.Combine(BOOT, "NLua.dll")));
-			Assembly.Load(File.ReadAllBytes(Path.Combine(BOOT, "NuGet.Core.dll")));
-			Assembly.Load (File.ReadAllBytes (Path.Combine (BOOT, "kaizo.exe"))).EntryPoint.Invoke(null, new[] { args });
-		}
+			var kaizo = Assembly.LoadFile (Path.Combine (BOOT, "kaizo.exe"));
+
+			var finalargs = new List<string>(args);
+      finalargs.Add ("-d");
+      finalargs.Add (Directory.GetCurrentDirectory ());
+
+      kaizo.GetType("Kaizo.MainClass").GetMethod("Main", BindingFlags.Public | BindingFlags.Static).Invoke (null, new[] { (string[])finalargs.ToArray() });
+    }
 
     private static void DirectoryDelete(string src)
     {
