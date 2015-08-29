@@ -1,27 +1,55 @@
-# Kaizo [![Build Status](https://travis-ci.org/nondev/kaizo.svg?branch=master)](https://travis-ci.org/nondev/kaizo)
+# Kaizo
 > A powerful build system for the CLR
 
-<img src="http://i.imgur.com/S1oVruZ.png" alt="Terminal demo" title="Terminal demo" align="center" width="100%"/>
+**Kaizo** is a build automation tool for [CLR](https://en.wikipedia.org/wiki/Common_Lasnguage_Runtime). Kaizo is using [Lua](http://lua.org) as build script language. Right now, Kaizo is in very early development, but it will work on Windows, Linux and Mac. Kaizo is heavily inspired by [Gradle](https://gradle.org/).
 
-**Kaizo** is build automation tool for [CLR](https://en.wikipedia.org/wiki/Common_Language_Runtime). It is using Lua as build script language. Right now, it is in very early development, but it will work on Windows, Linux and Mac. Kaizo is inspired by [Gradle](https://gradle.org/) for Java.
+### Installation
 
-Here is example `project.lua` what will build **Kaizo** itself:
+You must have [Git](http://git.com) and [Mono](https://mono.org) installed.
+
+#### Linux or Mac OS X
+
+```bash
+git clone "https://github.com/nondev/kaizo.git"
+cd kaizo && ./install && cd bootstrap
+mkdir $YOUR_PROJECT_DIRECTORY
+cp kaizow $YOUR_PROJECT_DIRECTORY
+cp kaizow.bat $YOUR_PROJECT_DIRECTORY
+cp kaizow.exe $YOUR_PROJECT_DIRECTORY
+```
+
+#### Windows
+
+```bash
+git clone "https://github.com/nondev/kaizo.git"
+cd kaizo
+install
+cd bootstrap
+mkdir %YOUR_PROJECT_DIRECTORY%
+copy kaizow %YOUR_PROJECT_DIRECTORY%
+copy kaizow.bat %YOUR_PROJECT_DIRECTORY%
+copy kaizow.exe %YOUR_PROJECT_DIRECTORY%
+```
+
+### Example
+
+Here is example `project.lua` what can build **Kaizo** itself:
 
 ```lua
 project('self')
 
 name = 'kaizo'
 version = '0.0.1'
+source = '../kaizo/src'
 
-configuration = {
-	type = 'exe',
-	source = '../kaizo/src',
-	output = 'bin',
-	resources = 'res',
-	deploy = 'Release',
-	namespace = 'Kaizo',
+properties = {
+	outputType = 'exe',
+	outputPath = 'bin',
+	configuration = 'Release',
+	rootNamespace = 'Kaizo',
 	platform = 'x86',
-	framework = 'v4.0'
+	platformTarget = 'x86',
+	targetFrameworkVersion = 'v4.0'
 }
 
 dependencies = {
@@ -37,15 +65,10 @@ dependencies = {
 		'Microsoft.Web.Xdt'
 	}
 }
-
-function compile()
-	task('self.clean')
-	task('self.build')
-end
 ```
 
-And to build it, simply navigate to bootstrap directory and run this from console:
+And to build it, simply navigate to `bootstrap` directory and run this from console:
 
-```shell
-./kaizow self.compile
+```
+./kaizow
 ```

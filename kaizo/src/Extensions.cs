@@ -5,9 +5,25 @@ namespace Kaizo
 {
 	public static class Extensions
 	{
+		public static object GetOptional(this Lua lua, string key, object defaultValue)
+		{
+			var result = lua [key];
+			if (result == null) return defaultValue;
+			return result;
+		}
+
 		public static LuaTable CreateTable(this Lua lua)
 		{
 			return (LuaTable)lua.DoString("return {}")[0];
+		}
+
+		public static string ToFirstUpper(this string str)
+		{
+			if (str.Length > 1) {
+				return char.ToUpper(str[0]) + str.Substring(1);
+			}
+
+			return str.ToUpper();
 		}
 
 		public static string ToReadableString(this TimeSpan span)

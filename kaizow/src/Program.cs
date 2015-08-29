@@ -10,19 +10,38 @@ namespace Kaizow
 {
 	class MainClass
 	{
-		private static readonly string HOME = Path.Combine(Environment.GetFolderPath (Environment.SpecialFolder.UserProfile), ".kaizo");
-		private static readonly string URL = "http://github.com/nondev/kaizo/archive/master.zip";
-		private static readonly string ZIP = Path.Combine(HOME, "kaizo.zip");
-		private static readonly string BOOT = Path.Combine(HOME, "kaizo-master", "bootstrap");
+    private static string HOME_DIR = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile));
+    private static string HOME_ORIG = Path.Combine (HOME_DIR, "kaizo-master");
+    private static string HOME = Path.Combine (HOME_DIR, ".kaizo");
+		private static string URL = "http://github.com/nondev/kaizo/archive/master.zip";
+    private static string ZIP = Path.Combine(HOME_DIR, "kaizo.zip");
+		private static string BOOT = Path.Combine(HOME, "bootstrap");
 
 		public static void Main (string[] args)
 		{
 			bool doUpdate = args.Length > 0 && args[0] == "update";
 
-			if (!Directory.Exists (BOOT) || (doUpdate))
+			if (!Directory.Exists (HOME) || (doUpdate))
 			{
+        if (Directory.Exists (HOME)) {
+          Console.Write("Deleting " + HOME);
+          DirectoryDelete (HOME);
+          Console.ForegroundColor = ConsoleColor.Magenta;
+          Console.WriteLine(" [DONE]");
+          Console.ResetColor();
+        }
+
+        if (args.Length > 1) {
+          Console.Write("Copying " + args[1]);
+          DirectoryCopy (args [1], HOME);
+          Console.ForegroundColor = ConsoleColor.Magenta;
+          Console.WriteLine(" [DONE]");
+          Console.ResetColor();
+          Console.WriteLine ("Installed to " + HOME);
+          return;
+        }
+
 				Console.Write("Downloading " + URL);
-				Directory.CreateDirectory (HOME);
 
 				using (var client = new WebClient ()) {
 					client.DownloadFile (URL, ZIP);
@@ -34,16 +53,22 @@ namespace Kaizow
 
 				Console.Write("Extracting " + ZIP);
 				using (var unzip = new Unzip (ZIP)) {
-					unzip.ExtractToDirectory (HOME);
+					unzip.ExtractToDirectory (HOME_DIR);
 				}
 
+        Directory.Move (HOME_ORIG, HOME);
 				File.Delete (ZIP);
 
 				Console.ForegroundColor = ConsoleColor.Magenta;
 				Console.WriteLine(" [DONE]");
 				Console.ResetColor();
+        Console.WriteLine ("Installed to " + HOME);
 
 				if (doUpdate) return;
+			}
+
+			if (File.Exists("kaizo.exe")) {
+				BOOT = Directory.GetCurrentDirectory();
 			}
 
 			Assembly.Load(File.ReadAllBytes(Path.Combine(BOOT, "KopiLua.dll")));
@@ -52,5 +77,49 @@ namespace Kaizow
 			Assembly.Load(File.ReadAllBytes(Path.Combine(BOOT, "NuGet.Core.dll")));
 			Assembly.Load (File.ReadAllBytes (Path.Combine (BOOT, "kaizo.exe"))).EntryPoint.Invoke(null, new[] { args });
 		}
+
+    private static void DirectoryDelete(string src)
+    {
+      DirectoryInfo dir = new DirectoryInfo(src);
+      DirectoryInfo[] dirs = dir.GetDirectories();
+
+      if (!dir.Exists) {
+        return;
+      }
+
+      FileInfo[] files = dir.GetFiles();
+
+      foreach (FileInfo file in files) {
+        file.Delete ();
+      }
+
+      foreach (DirectoryInfo subdir in dirs) {
+        DirectoryDelete(subdir.FullName);
+      }
+    }
+
+    private static void DirectoryCopy(string src, string dest)
+    {
+      DirectoryInfo dir = new DirectoryInfo(src);
+      DirectoryInfo[] dirs = dir.GetDirectories();
+
+      if (!dir.Exists) {
+        return;
+      }
+
+      if (!Directory.Exists(dest)) {
+        Directory.CreateDirectory(dest);
+      }
+
+      FileInfo[] files = dir.GetFiles();
+
+      foreach (FileInfo file in files) {
+        file.CopyTo(Path.Combine(dest, file.Name), false);
+      }
+
+      foreach (DirectoryInfo subdir in dirs) {
+        DirectoryCopy(subdir.FullName, Path.Combine(dest, subdir.Name));
+      }
+    }
 	}
 }

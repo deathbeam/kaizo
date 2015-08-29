@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Execution;
+using Microsoft.Build.Framework;
 using Microsoft.Build.Logging;
 using NLua;
 using NuGet;
-using Microsoft.Build.Framework;
+using System.Net;
 
 namespace Kaizo.Tasks
 {
@@ -14,56 +15,40 @@ namespace Kaizo.Tasks
 	{
 		public Build(Lua lua) : base(lua) { }
 
-		public void Run(string project) {
-			var name = lua [project + ".name"] as string;
-			if (name == null) name = "project";
-
-			var version = lua [project + ".version"] as string;
-			if (version == null) version = "1.0.0";
-
-			var nspace = lua [project + ".configuration.namespace"] as string;
-			if (nspace == null) nspace = name;
-
-			var deploy = lua [project + ".configuration.deploy"] as string;
-			if (deploy == null) deploy = "Release";
-
-			var platform = lua [project + ".configuration.platform"] as string;
-			if (platform == null) platform = "anycpu";
-
-			var type = lua [project + ".configuration.type"] as string;
-			if (type == null) type = "exe";
-
-			var source = lua [project + ".configuration.source"] as string;
+		public ProjectRootElement Run(string project) {
+			var source = lua [project + ".source"] as string;
 			if (source == null) source = "src";
 
-			var output = lua [project + ".configuration.output"] as string;
-			if (output == null) output = "out";
-
-			var resources = lua [project + ".configuration.resources"] as string;
+			var resources = lua [project + ".resources"] as string;
 			if (resources == null) resources = "res";
 
-			var framework = lua [project + ".configuration.framework"] as string;
-			if (framework == null) framework = "v4.0";
-
 			var root = ProjectRootElement.Create ();
-			root.AddImport ("$(MSBuildBinPath)\\Microsoft.configuration.targets");
+			root.AddImport ("$(MSBuildBinPath)\\Microsoft.CSharp.targets");
 
-			var group = root.AddPropertyGroup ();
-			group.AddProperty ("Configuration", deploy);
-			group.AddProperty ("Platform", platform);
-			group.AddProperty ("PlatformTarget", platform);
-			group.AddProperty ("RootNamespace", nspace);
-			group.AddProperty ("AssemblyName", name);
-			group.AddProperty ("ProductVersion", version);
-			group.AddProperty ("OutputPath", output);
-			group.AddProperty ("OutputType", type);
-			group.AddProperty ("ProjectGuid", "{" + System.Guid.NewGuid ().ToString () + "}");
-			group.AddProperty ("TargetFrameworkVersion", framework);
-			group.AddProperty ("SchemaVersion", "2.0");
+			var properties = root.AddPropertyGroup ();
+			properties.AddProperty ("AssemblyName", lua.GetOptional(project + ".name", "project") as string);
+			properties.AddProperty ("ProductVersion", lua.GetOptional(project + ".version", "1.0.0") as string);
+			properties.AddProperty ("ProjectGuid", "{" + System.Guid.NewGuid ().ToString () + "}");
+			properties.AddProperty ("SchemaVersion", "2.0");
+
+			var luaproperties = lua[project + ".properties"] as LuaTable;
+
+			if (luaproperties.Keys.Count > 0) {
+				foreach (string key in luaproperties.Keys) {
+					var val = luaproperties[key];
+					if (val is string) properties.AddProperty(key.ToFirstUpper(), val as string);
+				}
+			}
 
 			Logger.Log (project + ".dependencies", ConsoleColor.Magenta);
 
-			var packages = new PackageManager(PackageRepositoryFactory.Default.CreateRepository("http://packages.nuget.org/api/v2"), "packages");
+      PackageManager packages;
+
+      try {
+        packages = new PackageManager(PackageRepositoryFactory.Default.CreateRepository("http://packages.nuget.org/api/v2"), "packages");
+      } catch (WebException e) {
+        packages = new PackageManager(new LocalPackageRepository("packages", true), "packages");
+      }
 
 			packages.PackageInstalled += delegate(object sender, PackageOperationEventArgs arg) {
 				Console.ForegroundColor = ConsoleColor.Magenta;
@@ -76,27 +61,26 @@ namespace Kaizo.Tasks
 			};
 
 			var references = root.AddItemGroup ();
-			var dependencies = lua [project + ".dependencies.system"];
+			var dependencies = lua [project + ".dependencies.system"] as LuaTable;
 
-			if (dependencies != null) {
-				foreach (string dep in (dependencies as LuaTable).Values) {
+			if (dependencies.Values.Count > 0) {
+				foreach (string dep in dependencies.Values) {
 					references.AddItem("Reference", dep);
 				}
 			}
 
-			dependencies = lua [project + ".dependencies.nuget"];
+			dependencies = lua [project + ".dependencies.nuget"] as LuaTable;
 
-			if (dependencies != null) {
-				foreach (string dep in (dependencies as LuaTable).Values) {
+			if (dependencies.Values.Count > 0) {
+				foreach (string dep in dependencies.Values) {
 					IPackage dependency = null;
 
 					if (dep.IndexOf (':') > -1) {
 						var splitdep = dep.Split (':');
-						packages.InstallPackage (splitdep [0], SemanticVersion.Parse (splitdep [1]));
+            try { packages.InstallPackage (splitdep [0], SemanticVersion.Parse (splitdep [1])); } catch (WebException e) { }
 						dependency = packages.LocalRepository.FindPackage (splitdep [0], SemanticVersion.Parse (splitdep [1]));
-
 					} else {
-						packages.InstallPackage (dep);
+            try { packages.InstallPackage (dep); } catch (WebException e) { }
 						dependency = packages.LocalRepository.FindPackage (dep);
 					}
 
@@ -112,16 +96,7 @@ namespace Kaizo.Tasks
 				}
 			}
 
-			dependencies = lua [project + ".dependencies.project"];
-
-			if (dependencies != null) {
-				var projects = root.AddItemGroup();
-
-				foreach (string dep in (dependencies as LuaTable).Values) {
-					MainClass.Call(dep + ".build");
-					projects.AddItem("ProjectReference", dep + ".csproj").AddMetadata("name", dep);
-				}
-			}
+			dependencies = lua [project + ".dependencies.project"] as LuaTable;
 
 			if (Directory.Exists (source)) {
 				var compile = root.AddItemGroup ();
@@ -140,13 +115,14 @@ namespace Kaizo.Tasks
 			}
 
 			ProjectInstance projectInstance = new ProjectInstance (root);
-			root.Save(Path.Combine(output, name + ".csproj"));
-			ConsoleLogger logger = new ConsoleLogger(LoggerVerbosity.Quiet);
+			ConsoleLogger logger = new ConsoleLogger(LoggerVerbosity.Minimal);
 			BuildManager manager = BuildManager.DefaultBuildManager;
 
 			manager.Build(
 				new BuildParameters() { DetailedSummary = true, Loggers = new[] { logger } },
 				new BuildRequestData(projectInstance, new string[] { "Build" }));
+
+			return root;
 		}
 	}
 }

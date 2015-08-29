@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+###########################
+# Kaizo self-install script
+###########################
+
+KAIZO_DIR=`PWD`
+cd bootstrap
+mono kaizo.exe
+cp -Rf bin/ ./
+./kaizow update "$KAIZO_DIR"

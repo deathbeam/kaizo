@@ -1,2 +1,0 @@
-nuget restore
-xbuild /p:Configuration=Release
