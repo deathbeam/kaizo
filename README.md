@@ -5,7 +5,7 @@
 
 ### Installation
 
-You must have [Git](http://git.com) and [Mono](https://mono.org) or [.NET](https://dotnetframework.com) installed.
+You must have [Git](https://git-scm.com/) and [Mono](http://www.mono-project.com/) or [.NET](http://www.microsoft.com/en-us/download/details.aspx?id=17851) installed.
 
 This installation method will install and compile latest Kaizo version from this repository.
 You can always simply download the wrapper scripts from bootstrap directory, and they will
