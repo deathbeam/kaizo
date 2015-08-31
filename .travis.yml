@@ -1,2 +1,3 @@
 language: csharp
 solution: Kaizo.sln
+script: ./install

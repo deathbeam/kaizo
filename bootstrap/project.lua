@@ -3,15 +3,12 @@ project('self')
 name = 'kaizo'
 version = '0.0.1'
 source = '../kaizo/src'
-resources = 'res'
 
-properties = {
+configuration = {
 	outputType = 'exe',
 	outputPath = 'bin',
-	configuration = 'Release',
 	rootNamespace = 'Kaizo',
-	platform = 'x86',
-	platformTarget = 'x86',
+	platformTarget = 'anycpu',
 	targetFrameworkVersion = 'v4.0'
 }
 
@@ -28,3 +25,8 @@ dependencies = {
 		'Microsoft.Web.Xdt'
 	}
 }
+
+function compile()
+	task('self.clean')
+	task('self.build')
+end

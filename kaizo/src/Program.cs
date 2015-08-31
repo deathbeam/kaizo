@@ -12,35 +12,54 @@ namespace Kaizo
 {
 	class MainClass
 	{
+    public static string HOME;
+    public static string CURRENT;
+    public static ConsoleColor COLOR = ConsoleColor.Magenta;
+    public static Version VERSION = Assembly.GetExecutingAssembly().GetName().Version;
+
     private static Lua lua;
 		private static Stopwatch time = new Stopwatch();
 
-		public static void Main (string[] args)
-		{
-      if (args.Length > 0) {
-        if (args [0] == "help") {
-          Logger.Log ("Available commands:", ConsoleColor.Magenta, "> ");
-          Logger.Log ("help                       - display this help message", ConsoleColor.Magenta, "./kaizow ");
-          Logger.Log ("update (<directory>)       - update kaizo from git repository or from <directory>", ConsoleColor.Magenta, "./kaizow ");
-          Logger.Log ("<tasks> (-arg <arguments>) - run <tasks> with optional <arguments>", ConsoleColor.Magenta, "./kaizow ");
-          return;
-        } else if (args [0] == "version") {
-          Logger.Log ("v" + Environment.Version.ToString(), ConsoleColor.Magenta, "Kaizo ");
-          return;
-        }
-      }
-
-			time.Start ();
-			Logger.Log("Build started", ConsoleColor.Magenta, "> ");
-
-      if (args.Contains("-d")) {
+		public static void Main (string[] args) {
+			if (args.Contains("-h")) {
         var arglist = new List<string>(args);
-        int index = arglist.IndexOf("-d");
-        Directory.SetCurrentDirectory(arglist[index + 1]);
+        int index = arglist.IndexOf("-h");
+        HOME = arglist [index + 1];
         arglist.RemoveAt(index);
         arglist.RemoveAt(index);
         args = arglist.ToArray();
       }
+
+      if (args.Contains("-d")) {
+        var arglist = new List<string>(args);
+        int index = arglist.IndexOf("-d");
+        CURRENT = arglist [index + 1];
+        arglist.RemoveAt(index);
+        arglist.RemoveAt(index);
+        args = arglist.ToArray();
+      }
+
+			if (HOME == null) HOME = Directory.GetCurrentDirectory();
+      if (CURRENT == null)  CURRENT = HOME;
+			Directory.SetCurrentDirectory(CURRENT);
+
+			if (args.Length == 0) args = new[] { "self.build" };
+
+      if (args [0] == "help") {
+        Logger.Default
+          .Log("> ", false, COLOR).Log ("Available commands:")
+          .Log("./kaizow ", false, COLOR).Log ("help                       - display this help message")
+          .Log("./kaizow ", false, COLOR).Log ("update (<directory>)       - update kaizo from git repository or from <directory>")
+          .Log("./kaizow ", false, COLOR).Log ("<tasks> (-arg <arguments>) - run <tasks> with optional <arguments>");
+        return;
+      } else if (args [0] == "version") {
+        Logger.Default.Log ("Kaizo ", false).Log(VERSION, true, ConsoleColor.Magenta);
+        return;
+      }
+
+			time.Start ();
+      Logger.Default.Log("> ", false, COLOR).Log("Build started");
+			Console.Write("Loading build script");
 
 			lua = new Lua ();
 			lua.LoadCLRPackage ();
@@ -68,14 +87,13 @@ namespace Kaizo
 			}
 
       lua.RegisterFunction ("task", typeof(Task).GetMethod("Call"));
+			LuaFunction project = null;
 
 			try {
-				lua.DoFile ("project.lua");
+        project = lua.LoadFile (Path.Combine(CURRENT, "project.lua"));
       } catch (LuaScriptException e) {
 				Fail (e);
 			}
-
-      if (args.Length == 0) args = new[] { "self.build" };
 
 			var cmdtasks = new List<string> (args);
 			var cmdargs = new List<string> (args);
@@ -97,6 +115,12 @@ namespace Kaizo
 
 			lua ["arg"] = luaargs;
 
+			Console.ForegroundColor = ConsoleColor.Magenta;
+			Console.WriteLine(" [DONE]");
+			Console.ResetColor();
+
+			project.Call();
+
 			foreach (var cmdtask in cmdtasks) {
         try {
           Task.Call (cmdtask);
@@ -107,19 +131,15 @@ namespace Kaizo
         }
 			}
 
-			lua.Dispose ();
-			time.Stop ();
-			Logger.Log("Build succesfull", ConsoleColor.Green, "> ");
-      Logger.Log("Finished in " + time.Elapsed.ToReadableString(), ConsoleColor.Magenta, "> ");
+      Logger.Default.Log ("> ", false, ConsoleColor.Green).Log ("Build succesfull");
+      Finish ();
 		}
 
-    public static Lua GetLua()
-    {
+    public static Lua GetLua() {
       return lua;
     }
 
-    public static void Fail(Exception e)
-    {
+    public static void Fail(Exception e) {
       if (e is LuaScriptException) {
         var le = e as LuaScriptException;
 
@@ -134,12 +154,16 @@ namespace Kaizo
 		}
 
     public static void Fail(string message) {
+      Logger.Default.Log("> ", false, ConsoleColor.Red).Log("Build failed with error:");
+      Console.WriteLine (message);
+      Finish ();
+      Environment.Exit (-1);
+    }
+
+    public static void Finish() {
       lua.Dispose ();
       time.Stop ();
-      Logger.Log("Build failed with error:", ConsoleColor.Red, "> ");
-      Console.WriteLine (message);
-      Logger.Log("Finished in " + time.Elapsed.ToReadableString(), ConsoleColor.Magenta, "> ");
-      Environment.Exit (-1);
+      Logger.Default.Log("> ", false, COLOR).Log("Finished in " + time.Elapsed.ToReadableString());
     }
 	}
 }

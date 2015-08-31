@@ -5,20 +5,17 @@ namespace Kaizo
 {
 	public static class Extensions
 	{
-		public static object GetOptional(this Lua lua, string key, object defaultValue)
-		{
+		public static object GetOptional(this Lua lua, string key, object defaultValue) {
 			var result = lua [key];
 			if (result == null) return defaultValue;
 			return result;
 		}
 
-		public static LuaTable CreateTable(this Lua lua)
-		{
+		public static LuaTable CreateTable(this Lua lua) {
 			return (LuaTable)lua.DoString("return {}")[0];
 		}
 
-		public static string ToFirstUpper(this string str)
-		{
+		public static string ToFirstUpper(this string str) {
 			if (str.Length > 1) {
 				return char.ToUpper(str[0]) + str.Substring(1);
 			}
@@ -26,8 +23,7 @@ namespace Kaizo
 			return str.ToUpper();
 		}
 
-		public static string ToReadableString(this TimeSpan span)
-		{
+		public static string ToReadableString(this TimeSpan span) {
 			string formatted = string.Format("{0}{1}{2}{3}",
 				span.Duration().Days > 0 ? string.Format("{0:0} day{1}, ", span.Days, span.Days == 1 ? String.Empty : "s") : string.Empty,
 				span.Duration().Hours > 0 ? string.Format("{0:0} hour{1}, ", span.Hours, span.Hours == 1 ? String.Empty : "s") : string.Empty,

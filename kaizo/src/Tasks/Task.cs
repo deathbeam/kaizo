@@ -23,9 +23,8 @@ namespace Kaizo.Tasks
 			lua.RegisterFunction(name, this, method);
 		}
 
-    public static object Call(string name, LuaTable args = null)
-    {
-      Logger.Log(name, ConsoleColor.Magenta);
+    public static object Call(string name, LuaTable args = null) {
+      Logger.Default.Log(":", false, MainClass.COLOR).Log(name);
       var task = MainClass.GetLua().GetFunction (name);
 
       if (task == null) {

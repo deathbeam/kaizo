@@ -5,33 +5,31 @@
 
 ### Installation
 
-You must have [Git](http://git.com) and [Mono](https://mono.org) installed.
+You must have [Git](http://git.com) and [Mono](https://mono.org) or [.NET](https://dotnetframework.com) installed.
+
+This installation method will install and compile latest Kaizo version from this repository.
+You can always simply download the wrapper scripts from bootstrap directory, and they will
+handle the installation.
 
 #### Linux or Mac OS X
 
 ```bash
-git clone "https://github.com/nondev/kaizo.git"
-cd kaizo && ./install && cd bootstrap
-cp kaizow $YOUR_PROJECT_DIRECTORY
-cp kaizow.bat $YOUR_PROJECT_DIRECTORY
-cp kaizow.exe $YOUR_PROJECT_DIRECTORY
+git clone https://github.com/nondev/kaizo.git
+cd kaizo && ./install && cp -Rf bootstrap "$YOUR_PROJECT_DIRECTORY"
 ```
 
 #### Windows
 
 ```bash
-git clone "https://github.com/nondev/kaizo.git"
+git clone https://github.com/nondev/kaizo.git
 cd kaizo
 install
-cd bootstrap
-xcopy kaizow %YOUR_PROJECT_DIRECTORY%
-xcopy kaizow.bat %YOUR_PROJECT_DIRECTORY%
-xcopy kaizow.exe %YOUR_PROJECT_DIRECTORY%
+xcopy /t bootstrap "%YOUR_PROJECT_DIRECTORY%"
 ```
 
 ### Example
 
-Here is example `project.lua` what can build **Kaizo** itself:
+Here is example [project.lua](bootstrap/project.lua) what can build **Kaizo** itself:
 
 ```lua
 project('self')
@@ -40,13 +38,11 @@ name = 'kaizo'
 version = '0.0.1'
 source = '../kaizo/src'
 
-properties = {
+configuration = {
 	outputType = 'exe',
 	outputPath = 'bin',
-	configuration = 'Release',
 	rootNamespace = 'Kaizo',
-	platform = 'x86',
-	platformTarget = 'x86',
+	platformTarget = 'anycpu',
 	targetFrameworkVersion = 'v4.0'
 }
 
@@ -63,10 +59,15 @@ dependencies = {
 		'Microsoft.Web.Xdt'
 	}
 }
+
+function compile()
+	task('self.clean')
+	task('self.build')
+end
 ```
 
-And to build it, simply navigate to `bootstrap` directory and run this from console:
+And to build it, simply run this from console:
 
-```
-./kaizow
+```bash
+./kaizo self.compile
 ```

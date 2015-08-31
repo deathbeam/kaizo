@@ -16,14 +16,27 @@ namespace Kaizow
     private static string HOME = Path.Combine (HOME_DIR, ".kaizo");
 		private static string URL = "http://github.com/nondev/kaizo/archive/master.zip";
     private static string ZIP = Path.Combine(HOME_DIR, "kaizo.zip");
-		private static string BOOT = Path.Combine(HOME, "bootstrap");
+		private static string BOOT = Path.Combine(HOME, "bin");
 
 		public static void Main (string[] args)
 		{
+			var finalargs = new List<string>(args);
+
+      if (!finalargs.Contains ("-d")) {
+        finalargs.Add ("-d");
+        finalargs.Add (Directory.GetCurrentDirectory ());
+      }
+
+			if (!finalargs.Contains ("-h")) {
+        finalargs.Add ("-h");
+        finalargs.Add (HOME);
+      }
+
+			args = finalargs.ToArray();
+
 			bool doUpdate = args.Length > 0 && args[0] == "update";
 
-			if (!Directory.Exists (HOME) || (doUpdate))
-			{
+			if (!Directory.Exists (HOME) || (doUpdate)) {
         if (Directory.Exists (HOME)) {
           Console.Write("Deleting " + HOME);
           DirectoryDelete (HOME);
@@ -75,10 +88,6 @@ namespace Kaizow
 
 			var kaizo = Assembly.LoadFile (Path.Combine (BOOT, "kaizo.exe"));
 
-			var finalargs = new List<string>(args);
-      finalargs.Add ("-d");
-      finalargs.Add (Directory.GetCurrentDirectory ());
-
       kaizo.GetType("Kaizo.MainClass").GetMethod("Main", BindingFlags.Public | BindingFlags.Static).Invoke (null, new[] { (string[])finalargs.ToArray() });
     }
 
@@ -93,11 +102,11 @@ namespace Kaizow
 
       FileInfo[] files = dir.GetFiles();
 
-      foreach (FileInfo file in files) {
+      foreach (var file in files) {
         file.Delete ();
       }
 
-      foreach (DirectoryInfo subdir in dirs) {
+      foreach (var subdir in dirs) {
         DirectoryDelete(subdir.FullName);
       }
     }
@@ -117,11 +126,11 @@ namespace Kaizow
 
       FileInfo[] files = dir.GetFiles();
 
-      foreach (FileInfo file in files) {
+      foreach (var file in files) {
         file.CopyTo(Path.Combine(dest, file.Name), false);
       }
 
-      foreach (DirectoryInfo subdir in dirs) {
+      foreach (var subdir in dirs) {
         DirectoryCopy(subdir.FullName, Path.Combine(dest, subdir.Name));
       }
     }

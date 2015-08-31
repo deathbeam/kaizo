@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
-###########################
+####################################################################################
 # Kaizo self-install script
-###########################
+####################################################################################
+
+# Uncomment below commands if you are experiencing problems
+# or if you want to rebuild also 'kaizow'
+
+# nuget restore
+# xbuild
 
 KAIZO_DIR=`PWD`
-cd bootstrap
-mono kaizo.exe
-cp -Rf bin/ ./
-./kaizow update "$KAIZO_DIR"
+cd bin && mono kaizo.exe self.compile -h $KAIZO_DIR -d $KAIZO_DIR/bootstrap
+cd .. && cp -Rf bootstrap/bin bin
+cd bootstrap && ./kaizo update $KAIZO_DIR
