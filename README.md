@@ -22,9 +22,7 @@ cd kaizo && ./install && cp -Rf bootstrap "$YOUR_PROJECT_DIRECTORY"
 
 ```bash
 git clone https://github.com/nondev/kaizo.git
-cd kaizo
-install
-xcopy /t bootstrap "%YOUR_PROJECT_DIRECTORY%"
+cd kaizo && install && xcopy /t bootstrap "%YOUR_PROJECT_DIRECTORY%"
 ```
 
 ### Example

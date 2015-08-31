@@ -11,10 +11,7 @@
 
 setlocal
 set KAIZO_DIR=%~dp0
-cd bin
-kaizo.exe self.compile -h %KAIZO_DIR% -d %KAIZO_DIR%/bootstrap
-cd ..
-xcopy bootstrap/bin bin /t
-cd bootstrap
-kaizo update %KAIZO_DIR%
+cd bin && kaizo.exe self.compile -h %KAIZO_DIR% -d %KAIZO_DIR%/bootstrap
+cd .. && xcopy bootstrap/bin bin /t
+cd bootstrap && kaizo update %KAIZO_DIR%
 endlocal
