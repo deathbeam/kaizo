@@ -2,8 +2,8 @@
 
 namespace Kaizo
 {
-	public class Logger
-	{
+  public class Logger
+  {
     public static Logger Default { get; }
 
     static Logger() {
@@ -19,6 +19,6 @@ namespace Kaizo
       if (endLine) Console.WriteLine ();
 
       return this;
-		}
-	}
+    }
+  }
 }

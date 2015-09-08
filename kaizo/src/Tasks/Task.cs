@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 namespace Kaizo.Tasks
 {
-	public abstract class Task
-	{
+  public abstract class Task
+  {
     public static Dictionary<string, Task> All { get; }
-		protected Lua lua;
-		protected string name;
+    protected Lua lua;
+    protected string name;
 
     static Task() {
       All = new Dictionary<string, Task> ();
@@ -17,11 +17,11 @@ namespace Kaizo.Tasks
 
     public Task(Lua lua) {
       this.lua = lua;
-			name = this.GetType ().Name.ToLower ();
-			MethodInfo method = this.GetType ().GetMethod ("Run");
-			All[name] = this;
-			lua.RegisterFunction(name, this, method);
-		}
+      name = this.GetType ().Name.ToLower ();
+      MethodInfo method = this.GetType ().GetMethod ("Run");
+      All[name] = this;
+      lua.RegisterFunction(name, this, method);
+    }
 
     public static object Call(string name, LuaTable args = null) {
       Logger.Default.Log(":", false, MainClass.COLOR).Log(name);
@@ -47,5 +47,5 @@ namespace Kaizo.Tasks
 
       return result;
     }
-	}
+  }
 }
