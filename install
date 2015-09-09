@@ -9,7 +9,7 @@
 # nuget restore
 # xbuild
 
-KAIZO_DIR=`PWD`
+KAIZO_DIR=`pwd`
 cd bin && mono kaizo.exe self.compile -h $KAIZO_DIR -d $KAIZO_DIR/bootstrap
 cd .. && cp -Rf bootstrap/bin bin
 cd bootstrap && ./kaizo update $KAIZO_DIR
